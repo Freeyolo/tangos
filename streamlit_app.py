@@ -124,17 +124,18 @@ with st.form("my_form"):
     ut = os.path.join(cwd, r'kart2.html')
     kart2.save(ut)
     st_kart = st_folium(kart2,width=700)
-    # =============================================================================
-    # Eksportering av data i CSV format
-    # =============================================================================
-    @st.cache
-    def convert_df(df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-        return df.to_csv().encode('utf-8')
-    csv = convert_df(eksponerte_bygg_syk)
-    st.download_button(
-       label="Download data as CSV",
-       data=csv,
-       file_name='large_df.csv',
-       mime='text/csv',
-       )
+
+# =============================================================================
+# Eksportering av data i CSV format
+# =============================================================================
+@st.cache
+def convert_df(df):
+# IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
+csv = convert_df(eksponerte_bygg_syk)
+st.download_button(
+   label="Download data as CSV",
+   data=csv,
+   file_name='large_df.csv',
+   mime='text/csv',
+   )
