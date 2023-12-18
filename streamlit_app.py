@@ -114,6 +114,9 @@ with st.form("my_form"):
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
     eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
     output = eksponerte_bygg_syk.copy()
+    output.drop(columns=['gml_id', 'oppdateringsdato', 'stedfestingVerifisert', 'bygningsnummer','opprinnelse', 'uuidBruksenhet', 'uuidBygning', 'bygningId', 'navnerom', 'versjonId','index_right'],inplace = True)
+    output['QD_bolig'] = QD_bolig
+    output['QD_vei'] = QD_vei
    
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
@@ -122,7 +125,7 @@ with st.form("my_form"):
     kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
     kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
     kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-    kart2 = eksponerte_bygg_syk.explore(m=kartpunkt,style_kwds=dict(color="red"))
+    kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
     ut = os.path.join(cwd, r'kart2.html')
     kart2.save(ut)
     st_kart = st_folium(kart2,width=700)
