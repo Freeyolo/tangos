@@ -17,6 +17,7 @@ from streamlit_folium import st_folium
 
 
 cwd = os.getcwd()
+output = pd.DataFrame()
 
 with st.form("my_form"):
    st.write("Input data")
@@ -113,7 +114,7 @@ with st.form("my_form"):
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
     eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
     output = eksponerte_bygg_syk.copy()
-    st.session_state.output
+   
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
     # =============================================================================
