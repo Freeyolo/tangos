@@ -136,9 +136,9 @@ with st.form("my_form"):
 # =============================================================================
 
 @st.cache_data
-def convert_df(_df):
+def convert_df(_dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode('utf-8')
+    return dinn.to_csv().encode('utf-8')
 csv = convert_df(output)
 st.download_button(
    label="Download data as CSV",
