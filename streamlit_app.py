@@ -128,11 +128,12 @@ with st.form("my_form"):
 # =============================================================================
 # Eksportering av data i CSV format
 # =============================================================================
+output = eksponerte_bygg_syk.copy()
 @st.cache
 def convert_df(df):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
-csv = convert_df(eksponerte_bygg_syk)
+csv = convert_df(output)
 st.download_button(
    label="Download data as CSV",
    data=csv,
