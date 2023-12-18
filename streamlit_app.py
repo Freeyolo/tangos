@@ -132,7 +132,7 @@ with st.form("my_form"):
 # =============================================================================
 
 @st.cache_data
-def convert_df(df):
+def convert_df(_df):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
 csv = convert_df(output)
