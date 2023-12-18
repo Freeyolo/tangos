@@ -2,3 +2,5 @@ pandas
 geopandas
 folium
 requests
+matplotlib
+mapclassify
