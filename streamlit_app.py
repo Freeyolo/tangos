@@ -11,6 +11,7 @@ import folium
 import os
 import requests
 import streamlit as st
+import streamlit-folium
 from streamlit-folium import st_folium
 from io import BytesIO
 
