@@ -120,7 +120,7 @@ kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow
 kart2 = eksponerte_bygg_syk.explore(m=kartpunkt,style_kwds=dict(color="red"))
 ut = os.path.join(cwd, r'kart2.html')
 kart2.save(ut)
-folium_static(kart2)
+st_kart = st_folium(kart2,width=700)
 # =============================================================================
 # Eksportering av data i CSV format
 # =============================================================================
