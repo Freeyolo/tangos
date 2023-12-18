@@ -18,7 +18,6 @@ from streamlit_folium import st_folium
 
 cwd = os.getcwd()
 output = pd.DataFrame()
-df = pd.DataFrame()
 
 with st.form("my_form"):
    st.write("Input data")
@@ -30,8 +29,8 @@ with st.form("my_form"):
    submitted = st.form_submit_button("Submit")
    if submitted:
     d = {'nording':[nording],'oesting':[oesting],'NEI':[NEI]}
-    df_inn = pd.DataFrame(data=d)
-    gdf = gpd.GeoDataFrame(df_inn, geometry=gpd.points_from_xy(df_inn.oesting,df_inn.nording),crs='EPSG:32633')
+    df = pd.DataFrame(data=d)
+    gdf = gpd.GeoDataFrame(df_inn, geometry=gpd.points_from_xy(df.oesting,df.nording),crs='EPSG:32633')
     
     # =============================================================================
     # denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
@@ -136,7 +135,7 @@ with st.form("my_form"):
 # =============================================================================
 
 @st.cache_data
-def convert_df(_dinn):
+def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return dinn.to_csv().encode('utf-8')
 csv = convert_df(output)
