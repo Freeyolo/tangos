@@ -29,8 +29,8 @@ with st.form("my_form"):
    submitted = st.form_submit_button("Submit")
    if submitted:
     d = {'nording':[nording],'oesting':[oesting],'NEI':[NEI]}
-    df = pd.DataFrame(data=d)
-    gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.oesting,df.nording),crs='EPSG:32633')
+    df_inn = pd.DataFrame(data=d)
+    gdf = gpd.GeoDataFrame(df_inn, geometry=gpd.points_from_xy(df_inn.oesting,df_inn.nording),crs='EPSG:32633')
     
     # =============================================================================
     # denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
