@@ -18,7 +18,7 @@ from streamlit_folium import st_folium
 
 cwd = os.getcwd()
 output = pd.DataFrame()
-output_csv = pdf.DataFrame()
+output_csv = pd.DataFrame()
 
 with st.form("my_form"):
    st.write("Input data")
