@@ -17,12 +17,6 @@ from streamlit_folium import st_folium
 
 
 cwd = os.getcwd()
-# nording = input("UTM33N NORD  koordinat:")
-# oesting = input("UTM33 ØST koordinat:")
-# NEI = float(input("Netto eksplosivinnhold:"))
-# nording = 6627962
-# oesting = 204012
-# NEI = 12920
 
 with st.form("my_form"):
    st.write("Input data")
