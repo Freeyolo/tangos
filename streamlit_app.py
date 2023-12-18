@@ -112,7 +112,7 @@ with st.form("my_form"):
         
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
     eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
-    
+    output = eksponerte_bygg_syk.copy()
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
     # =============================================================================
@@ -128,7 +128,7 @@ with st.form("my_form"):
 # =============================================================================
 # Eksportering av data i CSV format
 # =============================================================================
-output = eksponerte_bygg_syk.copy()
+
 @st.cache
 def convert_df(df):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
