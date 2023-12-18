@@ -18,6 +18,7 @@ from streamlit_folium import st_folium
 
 cwd = os.getcwd()
 output = pd.DataFrame()
+df = pd.DataFrame()
 
 with st.form("my_form"):
    st.write("Input data")
