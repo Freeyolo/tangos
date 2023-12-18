@@ -113,10 +113,11 @@ with st.form("my_form"):
         
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
     eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
-    output = pd.DataFrame(eksponerte_bygg_syk) #konverter tilbake til pandas dataframe
+    output = eksponerte_bygg_syk.copy()
     output = output.drop(columns=['gml_id', 'oppdateringsdato', 'stedfestingVerifisert', 'bygningsnummer','opprinnelse', 'uuidBruksenhet', 'uuidBygning', 'bygningId', 'navnerom', 'versjonId','index_right'])
     output['QD_bolig'] = QD_bolig
     output['QD_vei'] = QD_vei
+    output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
    
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
@@ -138,7 +139,7 @@ with st.form("my_form"):
 def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return dinn.to_csv().encode('utf-8')
-csv = convert_df(output)
+csv = convert_df(output_csv)
 st.download_button(
    label="Download data as CSV",
    data=csv,
