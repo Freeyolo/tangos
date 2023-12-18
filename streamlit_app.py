@@ -130,7 +130,7 @@ with st.form("my_form"):
     kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
     ut = os.path.join(cwd, r'kart2.html')
     kart2.save(ut)
-    st_kart = st_folium(kart2,width=700,zoom=3)
+    st_kart = st_folium(kart2,width=700,zoom=15)
 
 # =============================================================================
 # Eksportering av data i CSV format
