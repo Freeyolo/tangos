@@ -5,3 +5,4 @@ requests
 matplotlib
 mapclassify
 streamlit
+streamlit-folium
