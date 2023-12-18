@@ -127,7 +127,7 @@ with st.form("my_form"):
     kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
     kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
     kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-    kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"),zoom_start=16)
+    kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"),zoom_start=7)
     ut = os.path.join(cwd, r'kart2.html')
     kart2.save(ut)
     st_kart = st_folium(kart2,width=700)
