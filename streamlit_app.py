@@ -24,7 +24,7 @@ with st.form("my_form"):
    st.write("Input data")
    nording = st.text_input('Nording',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
    oesting = st.text_input('Østing',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
-   NEI = st.number_input('Totalvekt', value=None,step=None, placeholder='Netto eksplosivinnhold i kg')
+   NEI = st.number_input('Totalvekt', value=None,step=500, placeholder='Netto eksplosivinnhold i kg')
 
    # Every form must have a submit button.
    submitted = st.form_submit_button("Submit")
