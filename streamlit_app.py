@@ -11,8 +11,6 @@ import folium
 import os
 import requests
 import streamlit as st
-import streamlit-folium
-from streamlit-folium import st_folium
 from io import BytesIO
 
 cwd = os.getcwd()
@@ -121,8 +119,7 @@ kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow
 kart2 = eksponerte_bygg_syk.explore(m=kartpunkt,style_kwds=dict(color="red"))
 ut = os.path.join(cwd, r'kart2.html')
 kart2.save(ut)
-# Vise kart i streamlit med folium
-st_data = st_folium(kart2, width=725)
+kart2
 # =============================================================================
 # Eksportering av data i CSV format
 # =============================================================================
