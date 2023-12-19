@@ -142,11 +142,12 @@ with st.form("my_form"):
 @st.cache_data
 def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return dinn.to_excel().encode('utf-8-sig')
-excel = convert_df(output_csv)
+    return dinn.to_csv().encode('utf-8-sig')
+csv = convert_df(output_csv)
 st.download_button(
-   label="Download data to excel",
-   data=excel,
-   file_name='large_df.xslx',
-   mime='text/excel',
+   label="Download data as CSV",
+   data=csv,
+   file_name='large_df.csv',
+   mime='text/csv',
    )
+
