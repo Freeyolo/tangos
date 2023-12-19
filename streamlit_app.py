@@ -114,12 +114,12 @@ with st.form("my_form"):
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
     eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
     output = eksponerte_bygg_syk.copy()
-    #output = output.drop(columns=['gml_id', 'oppdateringsdato', 'stedfestingVerifisert', 'bygningsnummer','opprinnelse', 'uuidBruksenhet', 'uuidBygning', 'bygningId', 'navnerom','bruksenhetId','adresseId','matrikkelenhetId', 'versjonId','index_right'])
     output['QD_bolig'] = QD_bolig
     output['QD_vei'] = QD_vei
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
     bygningstype = pd.read_csv(bygningstype_url,index_col=0,sep=';',usecols=['Kodeverdi','Beskrivelse'],encoding='utf8')
     output_csv = output_csv.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
+    output_csv = output_csv.drop(columns=['gml_id', 'oppdateringsdato', 'stedfestingVerifisert', 'bygningsnummer','opprinnelse', 'uuidBruksenhet', 'uuidBygning', 'bygningId', 'navnerom','bruksenhetId','adresseId','matrikkelenhetId', 'versjonId','index_right'])
    
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
