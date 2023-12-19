@@ -142,7 +142,7 @@ with st.form("my_form"):
 @st.cache_data
 def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return dinn.to_csv().encode('utf-8')
+    return dinn.to_csv().encode('utf-8-sig')
 csv = convert_df(output_csv)
 st.download_button(
    label="Download data as CSV",
