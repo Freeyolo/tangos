@@ -119,6 +119,7 @@ with st.form("my_form"):
     output['QD_bolig'] = QD_bolig
     output['QD_vei'] = QD_vei
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
+    bygningstype = pd.read_csv(bygningstype.csv)
    
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
