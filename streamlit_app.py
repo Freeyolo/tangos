@@ -147,7 +147,7 @@ csv = convert_df(output_csv)
 st.download_button(
    label="Download data as CSV",
    data=csv,
-   file_name='large_df.csv',
+   file_name='eksponerte_bygg.csv',
    mime='text/csv',
    )
 
