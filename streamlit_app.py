@@ -120,7 +120,7 @@ with st.form("my_form"):
     output['QD_bolig'] = QD_bolig
     output['QD_vei'] = QD_vei
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
-    bygningstype = pd.read_csv(bygningstype_url,index_col=0,sep=';',usecols=['Kodeverdi','Beskrivelse'])
+    bygningstype = pd.read_csv(bygningstype_url,index_col=0,sep=';',usecols=['Kodeverdi','Beskrivelse'],encoding='utf8')
     output_csv = output_csv.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
    
     # =============================================================================
