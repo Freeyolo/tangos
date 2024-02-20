@@ -124,9 +124,7 @@ with st.form("my_form"):
     
     #output = eksponerte_bygg_syk.copy()
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
-    output_csv = output_csv.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
-    
-   
+       
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
     # =============================================================================
