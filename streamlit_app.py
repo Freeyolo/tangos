@@ -137,7 +137,7 @@ with st.form("my_form"):
         st_kart = st_folium(kart2,width=700,zoom=15)
     else:
         output_csv = pd.DataFrame()
-        st.write('Ingen utsatte objekter eksponert')
+        st.write('Ingen utsatte objekter eksponert :sunglasses:')
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
