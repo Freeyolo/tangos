@@ -117,7 +117,7 @@ with st.form("my_form"):
             return gpd.GeoDataFrame()
         
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
-    eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden
+    eksponerte_bygg_syk = gpd.sjoin(result_geodataframe,gdf_syk,predicate='within') # finner bygninger fra matrikkelen innenfor sikkerhetsavstanden gdf_syk
     output = eksponerte_bygg_syk[['bygningstype','geometry']]
     bygningstype = pd.read_csv(bygningstype_url,index_col=False,sep=';',usecols=['Navn','Kodeverdi'],encoding='utf8')
     output = output.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
