@@ -125,6 +125,7 @@ with st.form("my_form"):
         output.drop(columns=['Kodeverdi'], inplace=True)
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
     else:
+        output = gpd.GeoDataFrame()
         output_csv = pd.DataFrame()   
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
