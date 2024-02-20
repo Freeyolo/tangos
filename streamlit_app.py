@@ -18,6 +18,17 @@ from streamlit_folium import st_folium
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
 bygningstype_url = 'https://raw.githubusercontent.com/Freeyolo/tangos/main/bygningstype.csv'
+   
+# =============================================================================
+# denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
+# (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37 
+# =============================================================================
+def QD_func(NEI):
+    QD_syk = round(44.4*NEI**(1/3))
+    QD_bolig = round(22.2*NEI**(1/3))
+    QD_vei = round(14.8*NEI**(1/3))
+    return QD_syk, QD_bolig, QD_vei
+
 
 with st.form("my_form"):
    st.write("Input data")
@@ -31,17 +42,7 @@ with st.form("my_form"):
     d = {'nording':[nording],'oesting':[oesting],'NEI':[NEI]}
     df = pd.DataFrame(data=d)
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.oesting,df.nording),crs='EPSG:32633')
-    
-    # =============================================================================
-    # denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
-    # (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37 
-    # =============================================================================
-    def QD_func(NEI):
-        QD_syk = round(44.4*NEI**(1/3))
-        QD_bolig = round(22.2*NEI**(1/3))
-        QD_vei = round(14.8*NEI**(1/3))
-        return QD_syk, QD_bolig, QD_vei
-    
+       
     QD_syk, QD_bolig, QD_vei = QD_func(NEI)
     
     gdf_syk = gdf.copy()
@@ -146,4 +147,3 @@ st.download_button(
    file_name='eksponerte_bygg.csv',
    mime='text/csv',
    )
-
