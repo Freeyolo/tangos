@@ -50,7 +50,7 @@ with st.form("my_form"):
     gdf_syk = gdf.copy()
     gdf_bolig = gdf.copy()
     gdf_vei = gdf.copy()
-    
+
     gdf_syk['QD_syk'] = QD_syk
     gdf_bolig['QD_bolig'] = QD_bolig
     gdf_vei['QD_vei'] = QD_vei
@@ -124,7 +124,7 @@ with st.form("my_form"):
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
     bygningstype = pd.read_csv(bygningstype_url,index_col=0,sep=';',usecols=['Kodeverdi','Beskrivelse'],encoding='utf8')
     output_csv = output_csv.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
-    #output_csv = output_csv.drop(columns=['gml_id', 'oppdateringsdato', 'stedfestingVerifisert', 'bygningsnummer','opprinnelse', 'uuidBruksenhet', 'uuidBygning', 'bygningId', 'navnerom','bruksenhetId','adresseId','matrikkelenhetId', 'versjonId','index_right'])
+    
    
     # =============================================================================
     # Plotting av data i kart og lagring av kartet
