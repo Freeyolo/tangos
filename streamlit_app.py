@@ -117,6 +117,7 @@ with st.form("my_form"):
             return gpd.GeoDataFrame()
         
     result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
+
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
         output = eksponerte_bygg_syk[['bygningstype', 'geometry']]
@@ -124,19 +125,20 @@ with st.form("my_form"):
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
         output.drop(columns=['Kodeverdi'], inplace=True)
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
-    else:
-        output = gpd.GeoDataFrame()
-        output_csv = pd.DataFrame()   
-    # =============================================================================
-    # Plotting av data i kart og lagring av kartet
-    # =============================================================================
-    kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
-    kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
-    kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
-    kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-    kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
-    st_kart = st_folium(kart2,width=700,zoom=15)
 
+        # =============================================================================
+        # Plotting av data i kart og lagring av kartet
+        # =============================================================================
+        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
+        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
+        kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
+        st_kart = st_folium(kart2,width=700,zoom=15)
+    else:
+        output_csv = pd.DataFrame()
+        st.write('Ingen utsatte objekter eksponert')
+ 
 # =============================================================================
 # Eksportering av data i CSV format
 # =============================================================================
