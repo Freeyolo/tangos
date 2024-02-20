@@ -121,7 +121,8 @@ with st.form("my_form"):
     output = eksponerte_bygg_syk[['bygningstype','geometry']]
     bygningstype = pd.read_csv(bygningstype_url,index_col=False,sep=';',usecols=['Navn','Kodeverdi'],encoding='utf8')
     output = output.merge(bygningstype,how='left',left_on='bygningstype',right_on='Kodeverdi')
-    
+    output.drop(columns=['Kodeverdi'], inplace=True)
+
     #output = eksponerte_bygg_syk.copy()
     output_csv = pd.DataFrame(output) #konverter tilbake til pandas dataframe
        
