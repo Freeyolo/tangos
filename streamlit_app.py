@@ -44,15 +44,19 @@ with st.form("my_form"):
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.oesting,df.nording),crs='EPSG:32633')
        
     QD_syk, QD_bolig, QD_vei = QD_func(NEI)
-    
+
+    #en geopandas geodataframe kan kun ha en "geometry" kolonne, derfor er det nødvendig å kopiere gdf tre ganger
+
     gdf_syk = gdf.copy()
-    gdf_syk['QD_syk'] = QD_syk
-    gdf_syk['geometry'] = gdf_syk['geometry'].buffer(gdf_syk['QD_syk'])
     gdf_bolig = gdf.copy()
-    gdf_bolig['QD_bolig'] = QD_bolig
-    gdf_bolig['geometry'] = gdf_bolig['geometry'].buffer(gdf_bolig['QD_bolig'])
     gdf_vei = gdf.copy()
+    
+    gdf_syk['QD_syk'] = QD_syk
+    gdf_bolig['QD_bolig'] = QD_bolig
     gdf_vei['QD_vei'] = QD_vei
+    
+    gdf_syk['geometry'] = gdf_syk['geometry'].buffer(gdf_syk['QD_syk'])  
+    gdf_bolig['geometry'] = gdf_bolig['geometry'].buffer(gdf_bolig['QD_bolig'])
     gdf_vei['geometry'] = gdf_vei['geometry'].buffer(gdf_vei['QD_vei'])
     
     # =============================================================================
