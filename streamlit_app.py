@@ -138,6 +138,14 @@ with st.form("my_form"):
     else:
         output_csv = pd.DataFrame()
         st.write('Ingen utsatte objekter eksponert')
+        # =============================================================================
+        # kart uten utsatte objekter
+        # =============================================================================
+        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
+        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
+        st_kart = st_folium(kartpunkt,width=700,zoom=15)
  
 # =============================================================================
 # Eksportering av data i CSV format
