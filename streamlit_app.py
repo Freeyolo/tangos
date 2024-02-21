@@ -24,11 +24,10 @@ bygningstype_url = 'https://raw.githubusercontent.com/Freeyolo/tangos/main/bygni
 # (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37 
 # =============================================================================
 def QD_func(NEI):
-    QD_syk = round(44.4*NEI**(1/3))
-    QD_bolig = round(22.2*NEI**(1/3))
-    QD_vei = round(14.8*NEI**(1/3))
+    QD_syk = max(round(44.4 * NEI ** (1/3)), 800)
+    QD_bolig = max(round(22.2 * NEI ** (1/3)), 400)
+    QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
-
 
 with st.form("my_form"):
    st.write("Input data")
