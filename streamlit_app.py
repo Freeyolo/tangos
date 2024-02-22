@@ -10,6 +10,7 @@ import geopandas as gpd
 import folium
 import os
 import requests
+from shapely import wkt
 import streamlit as st
 from io import BytesIO
 
