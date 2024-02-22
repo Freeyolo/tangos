@@ -188,7 +188,7 @@ with st.form("my_form"):
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
         st_kart = st_folium(kart2,width=700,zoom=13)
         
-        if not result_geodataframe.empty:
+        if not result_veg_geodataframe.empty:
             kart_veg = result_veg_geodataframe.explore(m=kart2,style_kwds=dict(color="black"))
             st_kart = st_folium(kart2,width=700,zoom=13)
         
