@@ -62,7 +62,7 @@ with st.form("my_form"):
     # Lage en firkantet bounding boks for QD_syk, denne vil også inneholde QD_bolig og QD_vei
     # =============================================================================
     gdf_syk_bbox = pd.concat([gdf_syk, gdf_syk['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene
-    
+    gdf_vei_bbox = pd.concat([gdf_vei, gdf_vei['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene  
     
     # =============================================================================
     # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
@@ -116,6 +116,15 @@ with st.form("my_form"):
             return gpd.GeoDataFrame()
         
     result_geodataframe = get_geo_data(gdf_syk_bbox.iloc[0])
+
+    # =============================================================================
+    # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
+    # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
+    # =============================================================================
+    def get_vei_data(row):
+
+        return vei_data
+
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
