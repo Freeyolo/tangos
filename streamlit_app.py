@@ -115,7 +115,7 @@ with st.form("my_form"):
             print(f"An unexpected error occurred: {e}")
             return gpd.GeoDataFrame()
         
-    result_geodataframe = get_geo_data(gdf_syk_bbox)
+    result_geodataframe = pd.concat([get_geo_data(row) for index, row in gdf_syk_bbox.iterrows()], ignore_index=True)
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
