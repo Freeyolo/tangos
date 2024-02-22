@@ -68,7 +68,7 @@ with st.form("my_form"):
     # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
     # =============================================================================
     
-    def get_geo_data(row):
+    def get_matrikkel_data(row):
         wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
         
         minx = row['minx']
@@ -104,8 +104,8 @@ with st.form("my_form"):
             
         try:
             # Load the GML response into a GeoDataFrame
-            geo_data = gpd.read_file(BytesIO(response.content))
-            return geo_data
+            matrikkel_data = gpd.read_file(BytesIO(response.content))
+            return matrikkel_data
         except ValueError as ve:
             # Handle ValueError, print the error message, and return an empty GeoDataFrame
             print(f"ValueError: {ve}")
@@ -115,7 +115,7 @@ with st.form("my_form"):
             print(f"An unexpected error occurred: {e}")
             return gpd.GeoDataFrame()
         
-    result_geodataframe = get_geo_data(gdf_syk_bbox.iloc[0])
+    result_geodataframe = get_matrikkel_data(gdf_syk_bbox.iloc[0])
 
     # =============================================================================
     # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
