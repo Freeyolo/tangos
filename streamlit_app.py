@@ -185,14 +185,10 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
+        kart_veg = result_veg_geodataframe.explore(m=kartpunkt,style_kwds=dict(color="black"))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
         st_kart = st_folium(kart2,width=700,zoom=13)
-        
-        if not result_veg_geodataframe.empty:
-            kart_veg = result_veg_geodataframe.explore(m=kart2,style_kwds=dict(color="black"))
-            st_kart = st_folium(kart2,width=700,zoom=13)
-        
-        
+          
     else:
         output_csv = pd.DataFrame()
         st.write('Ingen utsatte objekter eksponert :sunglasses:')
