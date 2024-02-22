@@ -121,10 +121,53 @@ with st.form("my_form"):
     # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
     # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
     # =============================================================================
-    def get_vei_data(row):
+    def get_veg_data(row):
+        nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
+        minx = row['minx']
+        miny = row['miny']
+        maxx = row['maxx']
+        maxy = row['maxy']
 
-        return vei_data
+        headers = {
+        'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
+        'X-Client': 'Utdrag ÅDT',
+        'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
+         }
+        params = {
+            'srid': '5973',
+            'inkluder': 'alle',
+            'segmentering': 'true',
+            'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
+            #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
+        }
+        response = requests.get(nvdburl, params=params, headers=headers)
+        jsonResponse = response.json()
+        vegdata_list = []
+        # Initialize an empty list to store dictionaries
+        vegdata_list = []
+        # Iterate through jsonResponse['objekter']
+        for vegobjekt in jsonResponse['objekter']:
+            vegdata_list.append({
+                'Vegobj_id': vegobjekt['id'],
+                'geometry': vegobjekt['geometri']['wkt']
+            })
+            
+            for egenskap in vegobjekt['egenskaper']:
+                if egenskap['id'] == 4621:
+                    vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
+                if egenskap['id'] == 4623:
+                    vegdata_list[-1]['ÅDT_total'] = egenskap['verdi']
+                if egenskap['id'] == 4625:
+                    vegdata_list[-1]['ÅDT_grunnlag'] = egenskap['verdi']
 
+        # Concatenate the list of dictionaries into a DataFrame
+        vegdata = pd.concat([pd.DataFrame(vegdata_list)])
+        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
+        # print(vegdata.columns)
+        geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
+        return geo_veg_data
+    
+    result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
@@ -135,7 +178,7 @@ with st.form("my_form"):
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
-        # Plotting av data i kart og lagring av kartet
+        # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
         kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
@@ -143,6 +186,12 @@ with st.form("my_form"):
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
         st_kart = st_folium(kart2,width=700,zoom=13)
+        
+        if not result_geodataframe.empty:
+            kart_veg = result_veg_geodataframe.explore(m=kart2,style_kwds=dict(color="black"))
+            st_kart = st_folium(kart2,width=700,zoom=13)
+        
+        
     else:
         output_csv = pd.DataFrame()
         st.write('Ingen utsatte objekter eksponert :sunglasses:')
