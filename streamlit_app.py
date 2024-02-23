@@ -143,8 +143,11 @@ with st.form("my_form"):
             
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
-    vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
-    vegsegmenter.crs = 'EPSG:32633'
+    if not result_veg_geodataframe.empty:
+        vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
+        vegsegmenter.crs = 'EPSG:32633'
+    else:
+        vegsegmenter = result_veg_geodataframe
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
@@ -167,7 +170,7 @@ with st.form("my_form"):
           
     else:
         output_csv = pd.DataFrame()
-        st.write('Ingen utsatte objekter eksponert :sunglasses:')
+        st.write('Ingen utsatte bygninger eksponert :sunglasses:')
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
