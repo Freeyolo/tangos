@@ -149,6 +149,11 @@ with st.form("my_form"):
             print ("Error:", err)
             return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
 
+        # Check if response is not in JSON format
+        if not isinstance(jsonResponse, dict):
+            print("Response is not in JSON format.")
+            return gpd.GeoDataFrame()  # Return empty GeoDataFrame if response is not JSON
+        
         # Initialize an empty list to store dictionaries
         vegdata_list = []
         # Iterate through jsonResponse['objekter']
@@ -157,7 +162,7 @@ with st.form("my_form"):
                 'Vegobj_id': vegobjekt['id'],
                 'geometry': vegobjekt['geometri']['wkt']
             })
-            
+
             for egenskap in vegobjekt['egenskaper']:
                 if egenskap['id'] == 4621:
                     vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
