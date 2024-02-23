@@ -141,9 +141,20 @@ with st.form("my_form"):
             'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
             #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
         }
-        response = requests.get(nvdburl, params=params, headers=headers)
+        try:
+            response = requests.get(nvdburl, params=params, headers=headers)
+            response.raise_for_status()  # Raises HTTPError for bad responses
+        except requests.exceptions.HTTPError as errh:
+            print ("HTTP Error:",errh)
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)
+        except requests.exceptions.RequestException as err:
+            print ("Error:",err)
+                
         jsonResponse = response.json()
-        vegdata_list = []
+
         # Initialize an empty list to store dictionaries
         vegdata_list = []
         # Iterate through jsonResponse['objekter']
