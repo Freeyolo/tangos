@@ -68,6 +68,60 @@ with st.form("my_form"):
     # =============================================================================
     # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
     # =============================================================================
+
+    def get_matrikkel_data(row):
+        wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
+
+        minx = row['minx']
+        miny = row['miny']
+        maxx = row['maxx']
+        maxy = row['maxy']
+
+        bbox_str = f'{minx},{miny},{maxx},{maxy},EPSG:32633'
+
+        params = {
+            'service': 'WFS',
+            'version': '2.0.0',
+            'request': 'GetFeature',
+            'typename': 'app:Bygning',
+            'srsname': 'EPSG:32633',
+            'outputformat': 'application/gml+xml; version=3.2',
+            'bbox': bbox_str,
+            #'count': '100', reduce output count
+        }
+
+
+        try:
+            response = requests.get(wfs_url, params=params)
+            response.raise_for_status()  # Raises HTTPError for bad responses
+        except requests.exceptions.HTTPError as errh:
+            print ("HTTP Error:",errh)
+        except requests.exceptions.ConnectionError as errc:
+            print ("Error Connecting:",errc)
+        except requests.exceptions.Timeout as errt:
+            print ("Timeout Error:",errt)
+        except requests.exceptions.RequestException as err:
+            print ("Error:",err)
+
+        try:
+            # Load the GML response into a GeoDataFrame
+            matrikkel_data = gpd.read_file(BytesIO(response.content))
+            return matrikkel_data
+        except ValueError as ve:
+            # Handle ValueError, print the error message, and return an empty GeoDataFrame
+            print(f"ValueError: {ve}")
+            return gpd.GeoDataFrame()
+        except Exception as e:
+            # Handle other exceptions, print the error message, and return an empty GeoDataFrame
+            print(f"An unexpected error occurred: {e}")
+            return gpd.GeoDataFrame()
+
+    result_geodataframe = get_matrikkel_data(gdf_syk_bbox.iloc[0])
+
+    # =============================================================================
+    # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
+    # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
+    # =============================================================================
     
     def get_veg_data(row):
         nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
