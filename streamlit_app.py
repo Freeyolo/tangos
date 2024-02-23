@@ -171,7 +171,7 @@ with st.form("my_form"):
         vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
         # print(vegdata.columns)
         geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
-            return geo_veg_data
+        return geo_veg_data
             
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
