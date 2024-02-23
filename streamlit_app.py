@@ -170,6 +170,7 @@ with st.form("my_form"):
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
     vegkart = result_veg_geodataframe.explode(ignore_index=True)
+    vegkart.crs = 'EPSG:32633'
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
@@ -182,12 +183,12 @@ with st.form("my_form"):
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
-        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
+        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color='black'))
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-        kart_veg = vegkart.explore(m=kartpunkt,style_kwds=dict(color="black"))
-        kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
+        kart_veg = vegkart.explore(m=kartpunkt,style_kwds=dict(color='black'))
+        kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'))
         st_kart = st_folium(kart2,width=700,zoom=13)
           
     else:
@@ -196,7 +197,7 @@ with st.form("my_form"):
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
-        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color="black"))
+        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color='black'))
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
