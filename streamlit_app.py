@@ -169,7 +169,7 @@ with st.form("my_form"):
         return geo_veg_data
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
-    vegkart = result_veg_geodataframe.explode()
+    vegkart = result_veg_geodataframe.explode(ignore_index=True)
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
