@@ -59,6 +59,9 @@ with st.form("my_form"):
     gdf_bolig['geometry'] = gdf_bolig['geometry'].buffer(gdf_bolig['QD_bolig'])
     gdf_vei['geometry'] = gdf_vei['geometry'].buffer(gdf_vei['QD_vei'])
     
+    #dette er kartpunktet for lageret
+    kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color='black'))
+
     # =============================================================================
     # Lage en firkantet bounding boks for QD_syk, denne vil også inneholde QD_bolig og QD_vei
     # =============================================================================
@@ -200,8 +203,8 @@ with st.form("my_form"):
     if not result_veg_geodataframe.empty:
         vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
         vegsegmenter.crs = 'EPSG:32633'
-    else:
-        vegsegmenter = result_veg_geodataframe
+        kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'))
+
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
@@ -214,11 +217,9 @@ with st.form("my_form"):
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
-        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color='black'))
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-        kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'))
         st_kart = st_folium(kart2,width=700,zoom=13)
           
@@ -228,7 +229,6 @@ with st.form("my_form"):
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
-        kartpunkt = gdf.explore(marker_type='marker',style_kwds=dict(color='black'))
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
