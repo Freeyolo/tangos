@@ -186,7 +186,7 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-        kart_veg = vekgkart.explore(m=kartpunkt,style_kwds=dict(color="black"))
+        kart_veg = vegkart.explore(m=kartpunkt,style_kwds=dict(color="black"))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color="red"))
         st_kart = st_folium(kart2,width=700,zoom=13)
           
