@@ -144,43 +144,34 @@ with st.form("my_form"):
         try:
             response = requests.get(nvdburl, params=params, headers=headers)
             response.raise_for_status()  # Raises HTTPError for bad responses
-        except requests.exceptions.HTTPError as errh:
-            print ("HTTP Error:",errh)
-        except requests.exceptions.ConnectionError as errc:
-            print ("Error Connecting:",errc)
-        except requests.exceptions.Timeout as errt:
-            print ("Timeout Error:",errt)
+            jsonResponse = response.json()
         except requests.exceptions.RequestException as err:
-            print ("Error:",err)
-                
-        jsonResponse = response.json()
+            print ("Error:", err)
+            return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
 
         # Initialize an empty list to store dictionaries
         vegdata_list = []
         # Iterate through jsonResponse['objekter']
-        if 'objekter' in jsonResponse:
-            for vegobjekt in jsonResponse['objekter']:
-                vegdata_list.append({
-                    'Vegobj_id': vegobjekt['id'],
-                    'geometry': vegobjekt['geometri']['wkt']
-                })
-                
-                for egenskap in vegobjekt['egenskaper']:
-                    if egenskap['id'] == 4621:
-                        vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
-                    if egenskap['id'] == 4623:
-                        vegdata_list[-1]['ÅDT_total'] = egenskap['verdi']
-                    if egenskap['id'] == 4625:
-                        vegdata_list[-1]['ÅDT_grunnlag'] = egenskap['verdi']
+        for vegobjekt in jsonResponse['objekter']:
+            vegdata_list.append({
+                'Vegobj_id': vegobjekt['id'],
+                'geometry': vegobjekt['geometri']['wkt']
+            })
+            
+            for egenskap in vegobjekt['egenskaper']:
+                if egenskap['id'] == 4621:
+                    vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
+                if egenskap['id'] == 4623:
+                    vegdata_list[-1]['ÅDT_total'] = egenskap['verdi']
+                if egenskap['id'] == 4625:
+                    vegdata_list[-1]['ÅDT_grunnlag'] = egenskap['verdi']
 
-            # Concatenate the list of dictionaries into a DataFrame
-            vegdata = pd.concat([pd.DataFrame(vegdata_list)])
-            vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
-            # print(vegdata.columns)
-            geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
+        # Concatenate the list of dictionaries into a DataFrame
+        vegdata = pd.concat([pd.DataFrame(vegdata_list)])
+        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
+        # print(vegdata.columns)
+        geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
             return geo_veg_data
-        else:
-            return gpd.GeoDataFrame()
             
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
