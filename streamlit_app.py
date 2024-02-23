@@ -169,9 +169,8 @@ with st.form("my_form"):
         return geo_veg_data
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
-    vegkart = result_veg_geodataframe.explode(ignore_index=True)
-    vegkart.crs = 'EPSG:32633'
-    eksponert_veg = gpd.sjoin(vegkart,gdf_vei, pedicate='within')
+    vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
+    vegsegmenter.crs = 'EPSG:32633'
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
@@ -188,7 +187,7 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
-        kart_veg = eksponert_veg.explore(m=kartpunkt,style_kwds=dict(color='black'))
+        kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'))
         st_kart = st_folium(kart2,width=700,zoom=13)
           
