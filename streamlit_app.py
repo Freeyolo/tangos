@@ -158,26 +158,30 @@ with st.form("my_form"):
         # Initialize an empty list to store dictionaries
         vegdata_list = []
         # Iterate through jsonResponse['objekter']
-        for vegobjekt in jsonResponse['objekter']:
-            vegdata_list.append({
-                'Vegobj_id': vegobjekt['id'],
-                'geometry': vegobjekt['geometri']['wkt']
-            })
-            
-            for egenskap in vegobjekt['egenskaper']:
-                if egenskap['id'] == 4621:
-                    vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
-                if egenskap['id'] == 4623:
-                    vegdata_list[-1]['ÅDT_total'] = egenskap['verdi']
-                if egenskap['id'] == 4625:
-                    vegdata_list[-1]['ÅDT_grunnlag'] = egenskap['verdi']
+        if 'objekter' in jsonResponse:
+            for vegobjekt in jsonResponse['objekter']:
+                vegdata_list.append({
+                    'Vegobj_id': vegobjekt['id'],
+                    'geometry': vegobjekt['geometri']['wkt']
+                })
+                
+                for egenskap in vegobjekt['egenskaper']:
+                    if egenskap['id'] == 4621:
+                        vegdata_list[-1]['ÅDT_år'] = egenskap['verdi']
+                    if egenskap['id'] == 4623:
+                        vegdata_list[-1]['ÅDT_total'] = egenskap['verdi']
+                    if egenskap['id'] == 4625:
+                        vegdata_list[-1]['ÅDT_grunnlag'] = egenskap['verdi']
 
-        # Concatenate the list of dictionaries into a DataFrame
-        vegdata = pd.concat([pd.DataFrame(vegdata_list)])
-        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
-        # print(vegdata.columns)
-        geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
-        return geo_veg_data
+            # Concatenate the list of dictionaries into a DataFrame
+            vegdata = pd.concat([pd.DataFrame(vegdata_list)])
+            vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
+            # print(vegdata.columns)
+            geo_veg_data = gpd.GeoDataFrame(vegdata, geometry ='geometry')
+            return geo_veg_data
+        else:
+            return gpd.GeoDataFrame()
+            
     
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
     vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
