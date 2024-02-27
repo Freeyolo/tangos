@@ -233,14 +233,22 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
-        kartindustri = industri.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Industri/lager")
-        kartkontor = kontor.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Kontor/forretning")
-        kartsamferdsel = samferdsel.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Samferdsel")
-        karthotell = hotell.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Hotell/restaurant")
-        kartkultur = kultur.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Skole/bhg/idrett")
-        karthelse = helse.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Helse")
-        kartbrann = brann.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Brann/politi")
-        kart2 = boliger.explore(m=kartpunkt,style_kwds=dict(color='orange'),name ="Boliger")
+        if not industri.empty:
+            kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Industri/lager")
+        if not kontor.empty:
+            kartkontor = kontor.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Kontor/forretning")
+        if not samferdsel.empty:
+            kartsamferdsel = samferdsel.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Samferdsel")
+        if not hotell.empty:
+            karthotell = hotell.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Hotell/restaurant")
+        if not kultur.empty:
+            kartkultur = kultur.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Skole/bhg/idrett")
+        if not helse.empty:
+            karthelse = helse.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Helse")
+        if not brann.empty:
+            kartbrann = brann.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Brann/politi")
+        if not kart2.empty:
+            kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
 
         folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kart2,width=672,zoom=13)
