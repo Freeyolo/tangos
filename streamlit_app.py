@@ -208,7 +208,7 @@ with st.form("my_form"):
         vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
         vegsegmenter.crs = 'EPSG:32633'
         veg_i_QD = gpd.sjoin(vegsegmenter, gdf_vei, predicate='intersects')
-        kart_veg = veg_i_QD.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
+        kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
 
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
