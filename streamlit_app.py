@@ -212,6 +212,7 @@ with st.form("my_form"):
         bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8')
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
         output.drop(columns=['Kodeverdi'], inplace=True)
+
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
