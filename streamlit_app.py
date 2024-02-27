@@ -247,7 +247,7 @@ with st.form("my_form"):
             karthelse = helse.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Helse")
         if not brann.empty:
             kartbrann = brann.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Brann/politi")
-        if not kart2.empty:
+        if not boliger.empty:
             kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
 
         folium.LayerControl().add_to(kart2)
