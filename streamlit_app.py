@@ -14,6 +14,8 @@ from shapely import wkt
 import streamlit as st
 from io import BytesIO
 
+st.set_page_config(layout="wide") #wide mode
+
 from streamlit_folium import st_folium
 
 output = pd.DataFrame()
