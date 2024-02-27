@@ -216,9 +216,9 @@ with st.form("my_form"):
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
-        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
-        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
-        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
+        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk')
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig')
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei')
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
         folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kart2,width=672,zoom=13)
@@ -229,9 +229,9 @@ with st.form("my_form"):
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
-        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
-        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
-        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
+        kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk')
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig')
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei')
         st_kart = st_folium(kartpunkt,width=672,zoom=13)
  
 # =============================================================================
