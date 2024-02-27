@@ -220,6 +220,11 @@ with st.form("my_form"):
         boliger = output[output['bygningstype'].str.startswith('1')]
         industri = output[output['bygningstype'].str.startswith('2')]
         kontor = output[output['bygningstype'].str.startswith('3')]
+        samferdsel = output[output['bygningstype'].str.startswith('4')]
+        hotell = output[output['bygningstype'].str.startswith('5')]
+        kultur = output[output['bygningstype'].str.startswith('6')]
+        helse = output[output['bygningstype'].str.startswith('7')]
+        brann = output[output['bygningstype'].str.startswith('8')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
@@ -228,9 +233,14 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
-        kartInd = industri.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Industri/lager")
-        kartKontor = kontor.explore(m=kartpunkt,style_kwds=dict(color='pink'),name ="kontor/forretning")
-        kart2 = boliger.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Boliger")
+        kartindustri = industri.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Industri/lager")
+        kartkontor = kontor.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Kontor/forretning")
+        kartsamferdsel = samferdsel.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Samferdsel")
+        karthotell = hotell.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Hotell/restaurant")
+        kartkultur = kultur.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Skole/bhg/idrett")
+        karthelse = helse.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Helse")
+        kartbrann = brann.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Brann/politi")
+        kart2 = boliger.explore(m=kartpunkt,style_kwds=dict(color='orange'),name ="Boliger")
 
         folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kart2,width=672,zoom=13)
