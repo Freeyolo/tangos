@@ -205,8 +205,6 @@ with st.form("my_form"):
         vegsegmenter.crs = 'EPSG:32633'
         kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
 
-
-
     if not result_geodataframe.empty:
         eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
         output = eksponerte_bygg_syk[['bygningstype', 'geometry']]
@@ -220,14 +218,15 @@ with st.form("my_form"):
         # =============================================================================
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
+        folium.LayerControl().add_to(kart2)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
-        folium.LayerControl().add_to(kart2)
+        
         st_kart = st_folium(kart2,width=672,zoom=13)
           
     else:
         output_csv = pd.DataFrame()
-        st.write('Ingen utsatte bygninger eksponert :sunglasses:')
+        st.write('Ingen bygninger eksponert :sunglasses:')
         # =============================================================================
         # kart uten utsatte objekter
         # =============================================================================
