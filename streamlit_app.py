@@ -62,7 +62,7 @@ with st.form("my_form"):
     gdf_vei['geometry'] = gdf_vei['geometry'].buffer(gdf_vei['QD_vei'])
     
     #dette er kartpunktet for lageret
-    kartpunkt = gdf.explore(marker_type='marker')
+    kartpunkt = gdf.explore(marker_type='marker',name='anlegg',control=False)
 
     # =============================================================================
     # Lage en firkantet bounding boks for QD_syk, denne vil også inneholde QD_bolig og QD_vei
