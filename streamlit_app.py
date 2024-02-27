@@ -50,8 +50,8 @@ with st.form("my_form"):
     #en geopandas geodataframe kan kun ha en "geometry" kolonne, derfor er det nødvendig å kopiere gdf tre ganger
 
     gdf_syk = gdf.copy().drop(columns=['nording','oesting'])
-    gdf_bolig = gdf.copy()
-    gdf_vei = gdf.copy()
+    gdf_bolig = gdf.copy().drop(columns=['nording','oesting'])
+    gdf_vei = gdf.copy().drop(columns=['nording','oesting'])
 
     gdf_syk['QD_syk'] = QD_syk
     gdf_bolig['QD_bolig'] = QD_bolig
