@@ -27,14 +27,12 @@ bygningstype_url = 'https://raw.githubusercontent.com/Freeyolo/tangos/main/bygni
 # denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
 # (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37 
 # =============================================================================
+
 def QD_func(NEI):
     QD_syk = max(round(44.4 * NEI ** (1/3)), 800)
     QD_bolig = max(round(22.2 * NEI ** (1/3)), 400)
     QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
-
-# Define colors for each building group to be used later one color for each group in 
-# https://www.ssb.no/klass/klassifikasjoner/31
 
 with st.form("my_form"):
    st.write("Input data")
@@ -207,7 +205,6 @@ with st.form("my_form"):
     if not result_veg_geodataframe.empty:
         vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
         vegsegmenter.crs = 'EPSG:32633'
-        veg_i_QD = gpd.sjoin(vegsegmenter, gdf_vei, predicate='intersects')
         kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
 
     if not result_geodataframe.empty:
@@ -233,6 +230,7 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
+
         if not industri.empty:
             kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Industri/lager")
         if not kontor.empty:
