@@ -70,11 +70,10 @@ with st.form("my_form"):
     gdf_syk_bbox = pd.concat([gdf_syk, gdf_syk['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene
     gdf_vei_bbox = pd.concat([gdf_vei, gdf_vei['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene  
     
-    # =============================================================================
-    # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
-    # =============================================================================
-
     def get_matrikkel_data(row):
+        # =============================================================================
+        # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
+        # =============================================================================
         wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
 
         minx = row['minx']
@@ -122,13 +121,12 @@ with st.form("my_form"):
             return gpd.GeoDataFrame()
 
     result_geodataframe = get_matrikkel_data(gdf_syk_bbox.iloc[0])
-
-    # =============================================================================
-    # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
-    # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
-    # =============================================================================
     
     def get_veg_data(row):
+        # =============================================================================
+        # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
+        # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
+        # =============================================================================
         nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
         minx = row['minx']
         miny = row['miny']
@@ -200,8 +198,8 @@ with st.form("my_form"):
         
         return geo_veg_data
             
-    
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
+
     if not result_veg_geodataframe.empty:
         vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
         vegsegmenter.crs = 'EPSG:32633'
