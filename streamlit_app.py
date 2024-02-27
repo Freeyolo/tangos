@@ -216,6 +216,9 @@ with st.form("my_form"):
         bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8')
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
         output.drop(columns=['Kodeverdi'], inplace=True)
+        output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
+        boliger = output[output['bygningstype'].str.startswith('1')]
+        industri = output[output['bygningstype'].str.startswith('2')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
@@ -224,9 +227,11 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
-        kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
+        kartInd = industri.explore(m=kartpunkt,style_kwds=dict(color='pink'),name ="Industri")
+        kart2 = boliger.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Boliger")
+
         folium.LayerControl().add_to(kart2)
-        st_kart = st_folium(kartpunkt,width=672,zoom=13)
+        st_kart = st_folium(kart2,width=672,zoom=13)
           
     else:
         output_csv = pd.DataFrame()
