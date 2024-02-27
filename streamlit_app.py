@@ -218,10 +218,9 @@ with st.form("my_form"):
         # =============================================================================
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'))
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'))
-        folium.LayerControl().add_to(kartpunkt)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'))
         kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
-        
+        folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kart2,width=672,zoom=13)
           
     else:
