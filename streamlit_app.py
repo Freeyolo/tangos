@@ -219,6 +219,7 @@ with st.form("my_form"):
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
         industri = output[output['bygningstype'].str.startswith('2')]
+        kontor = output[output['bygningstype'].str.startswith('3')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
@@ -227,7 +228,8 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
-        kartInd = industri.explore(m=kartpunkt,style_kwds=dict(color='pink'),name ="Industri")
+        kartInd = industri.explore(m=kartpunkt,style_kwds=dict(color='grey'),name ="Industri/lager")
+        kartKontor = kontor.explore(m=kartpunkt,style_kwds=dict(color='pink'),name ="kontor/forretning")
         kart2 = boliger.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Boliger")
 
         folium.LayerControl().add_to(kart2)
