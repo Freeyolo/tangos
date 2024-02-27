@@ -204,7 +204,7 @@ with st.form("my_form"):
         vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
         vegsegmenter.crs = 'EPSG:32633'
         kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
-        folium.LayerControl().add_to(kartpunkt)
+
 
 
     if not result_geodataframe.empty:
