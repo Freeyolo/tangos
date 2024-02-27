@@ -228,6 +228,9 @@ with st.form("my_form"):
         bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8')
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
         output.drop(columns=['Kodeverdi'], inplace=True)
+        
+        # Convert 'bygningstype' column to string type
+        output['bygningstype'] = output['bygningstype'].astype(str)
         output['color'] = output['bygningstype'].str[0].map(building_colors) #bruker building colors definert i starten av programmet
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
