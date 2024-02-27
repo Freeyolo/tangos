@@ -36,18 +36,6 @@ def QD_func(NEI):
 # Define colors for each building group to be used later one color for each group in 
 # https://www.ssb.no/klass/klassifikasjoner/31
 
-building_colors = {
-    '1': 'blue',
-    '2': 'green',
-    '3': 'red',
-    '4': 'orange',
-    '5': 'purple',
-    '6': 'brown',
-    '7': 'pink',
-    '8': 'gray'
-}
-
-
 with st.form("my_form"):
    st.write("Input data")
    nording = st.text_input('Nording',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
@@ -228,10 +216,6 @@ with st.form("my_form"):
         bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8')
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
         output.drop(columns=['Kodeverdi'], inplace=True)
-        
-        # Convert 'bygningstype' column to string type
-        output['bygningstype'] = output['bygningstype'].astype(str)
-        output['color'] = output['bygningstype'].str[0].map(building_colors) #bruker building colors definert i starten av programmet
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
@@ -240,13 +224,8 @@ with st.form("my_form"):
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
         kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
-        marker_cluster = MarkerCluster().add_to(kartpunkt)
-        for index, row in df.iterrows():
-            folium.Marker([row['latitude'], row['longitude']], 
-                          icon=folium.Icon(color=row['color']), 
-                          popup=row['popup_content']).add_to(marker_cluster)
-        #kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
-        #folium.LayerControl().add_to(kart2)
+        kart2 = output.explore(m=kartpunkt,style_kwds=dict(color='red'),name ="Bygninger")
+        folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kartpunkt,width=672,zoom=13)
           
     else:
