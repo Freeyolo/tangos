@@ -222,6 +222,7 @@ with st.form("my_form"):
         kultur = output[output['bygningstype'].str.startswith('6')]
         helse = output[output['bygningstype'].str.startswith('7')]
         brann = output[output['bygningstype'].str.startswith('8')]
+        annet = output[output['bygningstype'].str.startswith('9')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
 
         # =============================================================================
@@ -232,11 +233,11 @@ with st.form("my_form"):
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
 
         if not industri.empty:
-            kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Industri/lager")
+            kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Industri/lager")
         if not kontor.empty:
-            kartkontor = kontor.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Kontor/forretning")
+            kartkontor = kontor.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Kontor/forretning")
         if not samferdsel.empty:
-            kartsamferdsel = samferdsel.explore(m=kartpunkt, style_kwds=dict(color='grey'), name="Samferdsel")
+            kartsamferdsel = samferdsel.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Samferdsel")
         if not hotell.empty:
             karthotell = hotell.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Hotell/restaurant")
         if not kultur.empty:
@@ -245,6 +246,8 @@ with st.form("my_form"):
             karthelse = helse.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Helse")
         if not brann.empty:
             kartbrann = brann.explore(m=kartpunkt, style_kwds=dict(color='red'), name="Brann/politi")
+        if not annet.empty:
+            kartannet = annet.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Annet")
         if not boliger.empty:
             kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
 
