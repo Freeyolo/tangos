@@ -229,8 +229,8 @@ with st.form("my_form"):
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
-        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
-        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='cadetblue'),name ='QDbolig',control=False)
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='black'),name ='QDvei',control=False)
 
         if not industri.empty:
             kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Industri/lager")
@@ -249,7 +249,7 @@ with st.form("my_form"):
         if not annet.empty:
             kartannet = annet.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Annet")
         if not boliger.empty:
-            kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
+            kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='cadetblue'), name="Boliger")
 
         folium.LayerControl().add_to(kart2)
         st_kart = st_folium(kart2,width=672,zoom=13)
@@ -261,8 +261,8 @@ with st.form("my_form"):
         # kart uten utsatte objekter
         # =============================================================================
         kartQDsyk = gdf_syk.explore(m=kartpunkt,style_kwds=dict(fill=False,color='red'),name ='QDsyk',control=False)
-        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
-        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='yellow'),name ='QDvei',control=False)
+        kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='cadetblue'),name ='QDbolig',control=False)
+        kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='black'),name ='QDvei',control=False)
         st_kart = st_folium(kartpunkt,width=672,zoom=13)
  
 # =============================================================================
