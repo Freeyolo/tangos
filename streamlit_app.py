@@ -157,8 +157,7 @@ def get_veg_data(row):
     geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
     
     return geo_veg_data
-
-    
+  
 def incident_pressure(D):
     """Create a function that uses the scaled distance (Z) to calculate the incident 
     pressure in kPa from the simplified Kingery & Bulmash polynomials
@@ -209,8 +208,13 @@ with st.form("my_form"):
     gdf_vei = gdf.copy().drop(columns=['nording','oesting'])
 
     gdf_syk['QD_syk'] = QD_syk
+    gdf_syk['trykk'] = '2 kPa'
+
     gdf_bolig['QD_bolig'] = QD_bolig
+    gdf_bolig['trykk kPa'] = '5 kPa'
+
     gdf_vei['QD_vei'] = QD_vei
+    gdf_vei['trykk kPa'] = '14 kPa'
     
     gdf_syk['geometry'] = gdf_syk['geometry'].buffer(gdf_syk['QD_syk'])  
     gdf_bolig['geometry'] = gdf_bolig['geometry'].buffer(gdf_bolig['QD_bolig'])
