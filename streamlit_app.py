@@ -208,7 +208,7 @@ with st.form("my_form"):
     gdf_vei = gdf.copy().drop(columns=['nording','oesting'])
 
     gdf_syk['QD_syk'] = QD_syk
-    gdf_syk['trykk'] = '2 kPa'
+    gdf_syk['trykk'] = '2 kPa' #trykket som korresponderer til QD avstanden, kun for visualisering
 
     gdf_bolig['QD_bolig'] = QD_bolig
     gdf_bolig['trykk'] = '5 kPa'
