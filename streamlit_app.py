@@ -243,7 +243,7 @@ with st.form("my_form"):
         output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
 
         output['avstand m'] = round(output.distance(gdf.iloc[0]['geometry'])) #regn ut avstanden til eksplosivlageret
-        output['trykk kPa'] = output['avstand'].apply(incident_pressure).round(2) #regner ut trykket og runder av til to desimaler
+        output['trykk kPa'] = output['avstand m'].apply(incident_pressure).round(2) #regner ut trykket og runder av til to desimaler
 
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
