@@ -239,7 +239,7 @@ with st.form("my_form"):
         bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8') #last in bygningstype fra SSB
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi') #få på leselige navn på bygningstype
         output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
-        output['avstand'] = output.distance(gdf) #regn ut avstanden til eksplosivlageret
+        output['avstand'] = output.distance(gdf.iloc[0]) #regn ut avstanden til eksplosivlageret
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
         industri = output[output['bygningstype'].str.startswith('2')]
