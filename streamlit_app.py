@@ -211,10 +211,10 @@ with st.form("my_form"):
     gdf_syk['trykk'] = '2 kPa'
 
     gdf_bolig['QD_bolig'] = QD_bolig
-    gdf_bolig['trykk kPa'] = '5 kPa'
+    gdf_bolig['trykk'] = '5 kPa'
 
     gdf_vei['QD_vei'] = QD_vei
-    gdf_vei['trykk kPa'] = '14 kPa'
+    gdf_vei['trykk'] = '14 kPa'
     
     gdf_syk['geometry'] = gdf_syk['geometry'].buffer(gdf_syk['QD_syk'])  
     gdf_bolig['geometry'] = gdf_bolig['geometry'].buffer(gdf_bolig['QD_bolig'])
