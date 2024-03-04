@@ -234,11 +234,12 @@ with st.form("my_form"):
         kart_veg = vegsegmenter.explore(m=kartpunkt,style_kwds=dict(color='black'), name="Vei")
 
     if not result_geodataframe.empty:
-        eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within')
-        output = eksponerte_bygg_syk[['bygningstype', 'geometry']]
-        bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8')
-        output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi')
-        output.drop(columns=['Kodeverdi'], inplace=True)
+        eksponerte_bygg_syk = gpd.sjoin(result_geodataframe, gdf_syk, predicate='within') #behold bare bygninger innenfor sirkelen
+        output = eksponerte_bygg_syk[['bygningstype', 'geometry']] #kun interessant med disse kolonnene for videre visualisering
+        bygningstype = pd.read_csv(bygningstype_url, index_col=False, sep=';', usecols=['Navn', 'Kodeverdi'], encoding='utf8') #last in bygningstype fra SSB
+        output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi') #få på leselige navn på bygningstype
+        output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
+        output['avstand'] = output.distance(gdf) #regn ut avstanden til eksplosivlageret
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
         industri = output[output['bygningstype'].str.startswith('2')]
