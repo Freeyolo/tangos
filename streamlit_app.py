@@ -242,8 +242,8 @@ with st.form("my_form"):
         output = output.merge(bygningstype, how='left', left_on='bygningstype', right_on='Kodeverdi') #få på leselige navn på bygningstype
         output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
 
-        output['avstand'] = round(output.distance(gdf.iloc[0]['geometry'])) #regn ut avstanden til eksplosivlageret
-        output['trykk'] = output['avstand'].apply(incident_pressure).round(2) #regner ut trykket og runder av til to desimaler
+        output['avstand m'] = round(output.distance(gdf.iloc[0]['geometry'])) #regn ut avstanden til eksplosivlageret
+        output['trykk kPa'] = output['avstand'].apply(incident_pressure).round(2) #regner ut trykket og runder av til to desimaler
 
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
