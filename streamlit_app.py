@@ -157,15 +157,16 @@ def get_veg_data(row):
     geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
     
     return geo_veg_data
-def scaled_distance(D):
-    """Calulates the scaled distance Z as a function of the distance D and the netto eksplosivinnehold (TNT equvivalents)"""
-    Z = D/NEI**(1/3)
-    return Z
+
     
-def incident_pressure(Z):
+def incident_pressure(D):
     """Create a function that uses the scaled distance (Z) to calculate the incident 
     pressure in kPa from the simplified Kingery & Bulmash polynomials
-    provided by Swisdak, M. in 1994"""
+    provided by Swisdak, M. in 1994 the input is the distance and net eksplosive content (NEI) in TNT equivalents
+    returns pressure in kPa"""
+
+    Z = D/NEI**(1/3) #scaled distance
+
     if Z <= 2.9:
         Az = 7.2106
         Bz = -2.1069
@@ -242,7 +243,8 @@ with st.form("my_form"):
         output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
 
         output['avstand'] = round(output.distance(gdf.iloc[0]['geometry'])) #regn ut avstanden til eksplosivlageret
-        
+        output['trykk'] = output['avstand'].apply(incident_pressure, axis=1) #regner ut trykket
+
         output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
         boliger = output[output['bygningstype'].str.startswith('1')]
         industri = output[output['bygningstype'].str.startswith('2')]
