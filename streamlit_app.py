@@ -23,16 +23,139 @@ output = pd.DataFrame()
 output_csv = pd.DataFrame()
 bygningstype_url = 'https://raw.githubusercontent.com/Freeyolo/tangos/main/bygningstype.csv'
    
-# =============================================================================
-# denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
-# (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37 
-# =============================================================================
+
 
 def QD_func(NEI):
+    """denne funksjonen tar netto eksplosivinnhold (NEI) som argument og returnerer sikkerhetsavstanden 
+    (QD, Quantity Distance) for hhv. sykehus, bolig og vei. QD er definert i eksplosivforskriften § 37"""
+
     QD_syk = max(round(44.4 * NEI ** (1/3)), 800)
     QD_bolig = max(round(22.2 * NEI ** (1/3)), 400)
     QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
+
+def get_matrikkel_data(row):
+    """Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box"""
+    wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
+
+    minx = row['minx']
+    miny = row['miny']
+    maxx = row['maxx']
+    maxy = row['maxy']
+
+    bbox_str = f'{minx},{miny},{maxx},{maxy},EPSG:32633'
+
+    params = {
+        'service': 'WFS',
+        'version': '2.0.0',
+        'request': 'GetFeature',
+        'typename': 'app:Bygning',
+        'srsname': 'EPSG:32633',
+        'outputformat': 'application/gml+xml; version=3.2',
+        'bbox': bbox_str,
+        #'count': '100', reduce output count
+    }
+
+
+    try:
+        response = requests.get(wfs_url, params=params)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+    except requests.exceptions.HTTPError as errh:
+        print ("HTTP Error:",errh)
+    except requests.exceptions.ConnectionError as errc:
+        print ("Error Connecting:",errc)
+    except requests.exceptions.Timeout as errt:
+        print ("Timeout Error:",errt)
+    except requests.exceptions.RequestException as err:
+        print ("Error:",err)
+
+    try:
+        # Load the GML response into a GeoDataFrame
+        matrikkel_data = gpd.read_file(BytesIO(response.content))
+        return matrikkel_data
+    except ValueError as ve:
+        # Handle ValueError, print the error message, and return an empty GeoDataFrame
+        print(f"ValueError: {ve}")
+        return gpd.GeoDataFrame()
+    except Exception as e:
+        # Handle other exceptions, print the error message, and return an empty GeoDataFrame
+        print(f"An unexpected error occurred: {e}")
+        return gpd.GeoDataFrame()
+
+def get_veg_data(row):
+    """Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
+    https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/"""
+    
+    nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
+    minx = row['minx']
+    miny = row['miny']
+    maxx = row['maxx']
+    maxy = row['maxy']
+
+    headers = {
+    'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
+    'X-Client': 'Utdrag ÅDT',
+    'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
+    }
+    params = {
+        'srid': '5973',
+        'inkluder': 'alle',
+        'segmentering': 'true',
+        'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
+        #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
+    }
+    try:
+        response = requests.get(nvdburl, params=params, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        jsonResponse = response.json()
+        
+        # Check if the response contains objects
+        if 'objekter' not in jsonResponse:
+            return gpd.GeoDataFrame()  # Return empty GeoDataFrame if no objects
+        
+    except requests.exceptions.RequestException as err:
+        print ("Error:", err)
+        return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
+    except ValueError as v_err:
+        print ("Error decoding JSON:", v_err)
+        return gpd.GeoDataFrame()  # Return empty GeoDataFrame if JSON decoding fails
+        
+    # Initialize an empty list to store dictionaries
+    vegdata_list = []
+    # Iterate through jsonResponse['objekter']
+    for vegobjekt in jsonResponse['objekter']:
+        vegdata_dict = {'Vegobj_id': vegobjekt['id']}
+        
+        # Check if the 'geometry' key exists in vegobjekt
+        if 'geometri' in vegobjekt and 'wkt' in vegobjekt['geometri']:
+            vegdata_dict['geometry'] = vegobjekt['geometri']['wkt']
+        
+        # Append the dictionary to the list
+        vegdata_list.append(vegdata_dict)
+
+        for egenskap in vegobjekt['egenskaper']:
+            if egenskap['id'] == 4621:
+                vegdata_dict['ÅDT_år'] = egenskap['verdi']
+            if egenskap['id'] == 4623:
+                vegdata_dict['ÅDT_total'] = egenskap['verdi']
+            if egenskap['id'] == 4625:
+                vegdata_dict['ÅDT_grunnlag'] = egenskap['verdi']
+
+    # Create a DataFrame from the list of dictionaries
+    vegdata = pd.DataFrame(vegdata_list)
+    
+    # If the DataFrame is empty, return an empty GeoDataFrame
+    if vegdata.empty:
+        return gpd.GeoDataFrame()
+    
+    # If 'geometry' column exists, convert the 'wkt' strings to Shapely geometries
+    if 'geometry' in vegdata:
+        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
+    
+    # Create a GeoDataFrame from the DataFrame
+    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
+    
+    return geo_veg_data
 
 with st.form("my_form"):
    st.write("Input data")
@@ -65,140 +188,14 @@ with st.form("my_form"):
     
     #dette er kartpunktet for lageret
     kartpunkt = gdf.explore(marker_type='marker',name='anlegg',control=False)
-
-    # =============================================================================
+    
     # Lage en firkantet bounding boks for QD_syk, denne vil også inneholde QD_bolig og QD_vei
-    # =============================================================================
     gdf_syk_bbox = pd.concat([gdf_syk, gdf_syk['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene
     gdf_vei_bbox = pd.concat([gdf_vei, gdf_vei['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene  
     
-    def get_matrikkel_data(row):
-        # =============================================================================
-        # Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box
-        # =============================================================================
-        wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
-
-        minx = row['minx']
-        miny = row['miny']
-        maxx = row['maxx']
-        maxy = row['maxy']
-
-        bbox_str = f'{minx},{miny},{maxx},{maxy},EPSG:32633'
-
-        params = {
-            'service': 'WFS',
-            'version': '2.0.0',
-            'request': 'GetFeature',
-            'typename': 'app:Bygning',
-            'srsname': 'EPSG:32633',
-            'outputformat': 'application/gml+xml; version=3.2',
-            'bbox': bbox_str,
-            #'count': '100', reduce output count
-        }
-
-
-        try:
-            response = requests.get(wfs_url, params=params)
-            response.raise_for_status()  # Raises HTTPError for bad responses
-        except requests.exceptions.HTTPError as errh:
-            print ("HTTP Error:",errh)
-        except requests.exceptions.ConnectionError as errc:
-            print ("Error Connecting:",errc)
-        except requests.exceptions.Timeout as errt:
-            print ("Timeout Error:",errt)
-        except requests.exceptions.RequestException as err:
-            print ("Error:",err)
-
-        try:
-            # Load the GML response into a GeoDataFrame
-            matrikkel_data = gpd.read_file(BytesIO(response.content))
-            return matrikkel_data
-        except ValueError as ve:
-            # Handle ValueError, print the error message, and return an empty GeoDataFrame
-            print(f"ValueError: {ve}")
-            return gpd.GeoDataFrame()
-        except Exception as e:
-            # Handle other exceptions, print the error message, and return an empty GeoDataFrame
-            print(f"An unexpected error occurred: {e}")
-            return gpd.GeoDataFrame()
-
     result_geodataframe = get_matrikkel_data(gdf_syk_bbox.iloc[0])
     
-    def get_veg_data(row):
-        # =============================================================================
-        # Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
-        # https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/
-        # =============================================================================
-        nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
-        minx = row['minx']
-        miny = row['miny']
-        maxx = row['maxx']
-        maxy = row['maxy']
-
-        headers = {
-        'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
-        'X-Client': 'Utdrag ÅDT',
-        'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
-        }
-        params = {
-            'srid': '5973',
-            'inkluder': 'alle',
-            'segmentering': 'true',
-            'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
-            #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
-        }
-        try:
-            response = requests.get(nvdburl, params=params, headers=headers)
-            response.raise_for_status()  # Raises HTTPError for bad responses
-            jsonResponse = response.json()
-            
-            # Check if the response contains objects
-            if 'objekter' not in jsonResponse:
-                return gpd.GeoDataFrame()  # Return empty GeoDataFrame if no objects
-            
-        except requests.exceptions.RequestException as err:
-            print ("Error:", err)
-            return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
-        except ValueError as v_err:
-            print ("Error decoding JSON:", v_err)
-            return gpd.GeoDataFrame()  # Return empty GeoDataFrame if JSON decoding fails
-            
-        # Initialize an empty list to store dictionaries
-        vegdata_list = []
-        # Iterate through jsonResponse['objekter']
-        for vegobjekt in jsonResponse['objekter']:
-            vegdata_dict = {'Vegobj_id': vegobjekt['id']}
-            
-            # Check if the 'geometry' key exists in vegobjekt
-            if 'geometri' in vegobjekt and 'wkt' in vegobjekt['geometri']:
-                vegdata_dict['geometry'] = vegobjekt['geometri']['wkt']
-            
-            # Append the dictionary to the list
-            vegdata_list.append(vegdata_dict)
-
-            for egenskap in vegobjekt['egenskaper']:
-                if egenskap['id'] == 4621:
-                    vegdata_dict['ÅDT_år'] = egenskap['verdi']
-                if egenskap['id'] == 4623:
-                    vegdata_dict['ÅDT_total'] = egenskap['verdi']
-                if egenskap['id'] == 4625:
-                    vegdata_dict['ÅDT_grunnlag'] = egenskap['verdi']
-
-        # Create a DataFrame from the list of dictionaries
-        vegdata = pd.DataFrame(vegdata_list)
-        
-        # If the DataFrame is empty, return an empty GeoDataFrame
-        if vegdata.empty:
-            return gpd.GeoDataFrame()
-        
-        # If 'geometry' column exists, convert the 'wkt' strings to Shapely geometries
-        if 'geometry' in vegdata:
-            vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
-        
-        # Create a GeoDataFrame from the DataFrame
-        geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
-        
-        return geo_veg_data
+    
             
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
 
