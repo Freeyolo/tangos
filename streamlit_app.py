@@ -10,6 +10,7 @@ import geopandas as gpd
 import folium
 from folium.plugins import MarkerCluster
 import os
+import numpy as np
 import requests
 from shapely import wkt
 import streamlit as st
@@ -156,6 +157,34 @@ def get_veg_data(row):
     geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
     
     return geo_veg_data
+def scaled_distance(D):
+    """Calulates the scaled distance Z as a function of the distance D and the netto eksplosivinnehold (TNT equvivalents)"""
+    Z = D/NEI**(1/3)
+    return Z
+    
+def incident_pressure(Z):
+    """Create a function that uses the scaled distance (Z) to calculate the incident 
+    pressure in kPa from the simplified Kingery & Bulmash polynomials
+    provided by Swisdak, M. in 1994"""
+    if Z <= 2.9:
+        Az = 7.2106
+        Bz = -2.1069
+        Cz = -0.3229
+        Dz = 0.1117
+        Ez = 0.0685
+    elif Z <= 23.8:
+        Az = 7.5938
+        Bz = -3.0523
+        Cz = 0.40977
+        Dz = 0.0261
+        Ez = -0.01267
+    elif Z > 23.8:
+        Az = 6.0536
+        Bz = -1.4066
+        Cz = 0
+        Dz = 0
+        Ez = 0
+    return (np.exp(Az+Bz*np.log(Z) + Cz * (np.log(Z))**2+ Dz * (np.log(Z))**3+ Ez * (np.log(Z))**4))
 
 with st.form("my_form"):
    st.write("Input data")
@@ -193,10 +222,10 @@ with st.form("my_form"):
     gdf_syk_bbox = pd.concat([gdf_syk, gdf_syk['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene
     gdf_vei_bbox = pd.concat([gdf_vei, gdf_vei['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene  
     
+    #dataframe med boliger innenfor sikkerhetsavstandene
     result_geodataframe = get_matrikkel_data(gdf_syk_bbox.iloc[0])
-    
-    
-            
+
+    #dataframe med vegsegmenter som har ÅDT innenfor sikkerhetsavstandene       
     result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
 
     if not result_veg_geodataframe.empty:
