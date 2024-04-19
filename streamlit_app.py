@@ -188,8 +188,8 @@ def incident_pressure(D):
 
 with st.form("my_form"):
    st.write("Input data")
-   nording = st.text_input('Nording',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
-   oesting = st.text_input('Østing',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
+   nording = st.number_input('Nording',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
+   oesting = st.number_input('Østing',value=None,placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
    NEI = st.number_input('Totalvekt', value=None,step=500, max_value=100000, placeholder='Netto eksplosivinnhold i kg')
 
    # Every form must have a submit button.
