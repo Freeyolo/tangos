@@ -221,15 +221,7 @@ with st.form("my_form"):
     gdf_vei['geometry'] = gdf_vei['geometry'].buffer(gdf_vei['QD_vei'])
     
     #dette er kartpunktet for lageret
-    kartpunkt = gdf.explore(style_kwds=dict(
-        style_function=lambda x: {
-            "html": f"""<span   class="fa fa-home" 
-                                style="color:{x["properties"]["__folium_color"]};
-                                font-size:14px"></span>"""
-        },
-    ),
-    marker_type="marker",
-    marker_kwds=dict(icon=folium.DivIcon()),name='anlegg',control=False)
+    kartpunkt = gdf.explore(marker_type="marker",name='anlegg',control=False)
     
     # Lage en firkantet bounding boks for QD_syk, denne vil også inneholde QD_bolig og QD_vei
     gdf_syk_bbox = pd.concat([gdf_syk, gdf_syk['geometry'].bounds], axis=1) #lager en firkantet bounding box for de sirkulære sikkerhetsavstandene
