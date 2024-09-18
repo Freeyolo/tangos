@@ -269,7 +269,7 @@ with st.form("my_form"):
         kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='black'),name ='QDvei',control=False)
 
         if not industri.empty:
-            kartindustri = industri.explore(m=kartpunkt,marker_type=folium.Marker(icon=folium.Icon(color='black', icon='industry', prefix='fa')), name="Industri/lager")
+            kartindustri = industri.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Industri/lager")
         if not kontor.empty:
             kartkontor = kontor.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Kontor/forretning")
         if not samferdsel.empty:
