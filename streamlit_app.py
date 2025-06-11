@@ -285,10 +285,10 @@ with st.form("my_form"):
         if not annet.empty:
             kartannet = annet.explore(m=kartpunkt, style_kwds=dict(color='black'), name="Annet")
         if not boliger.empty:
-            kart2 = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
+            kartboliger = boliger.explore(m=kartpunkt, style_kwds=dict(color='orange'), name="Boliger")
 
-        folium.LayerControl().add_to(kart2)
-        st_kart = st_folium(kart2,width=672,zoom=13)
+        folium.LayerControl().add_to(kartpunkt)
+        st_kart = st_folium(kartpunkt,width=672,zoom=13)
           
     else:
         output_csv = pd.DataFrame()
