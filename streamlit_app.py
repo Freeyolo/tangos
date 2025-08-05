@@ -314,12 +314,16 @@ st.download_button(
    label="Download data as CSV",
    data=csv,
    file_name='eksponerte_bygg.csv',
+   on_click="ignore",
    mime='text/csv',
+   icon=":material/download:",
    )
 
 st.download_button(
    label="Export AMRISK2.5 file",
    data="tralalalala",
    file_name='eksponerte_bygg.amr25',
+   on_click="ignore",
    mime='text/csv',
+   icon=":material/download:",
    )
