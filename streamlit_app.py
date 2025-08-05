@@ -319,6 +319,10 @@ st.download_button(
    icon=":material/download:",
    )
 
+# =============================================================================
+# Eksportering av data i amr2.5 format
+# =============================================================================
+
 st.download_button(
    label="Export AMRISK2.5 file",
    data="tralalalala",
