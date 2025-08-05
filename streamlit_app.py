@@ -316,3 +316,10 @@ st.download_button(
    file_name='eksponerte_bygg.csv',
    mime='text/csv',
    )
+
+st.download_button(
+   label="Export AMRISK2.5 file",
+   data="tralalalala",
+   file_name='eksponerte_bygg.amr25',
+   mime='text/csv',
+   )
