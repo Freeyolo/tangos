@@ -343,4 +343,5 @@ with col3:
            on_click="ignore",
            mime='text/csv',
            icon=":material/download:",
+           disabled=st.session_state.get('amrisk_file') is None
            )
