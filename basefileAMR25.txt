@@ -1,0 +1,60 @@
+﻿ Flilename                      Exported from AMRISK 2.5
+ Storage area name              Tangos eksport
+ Storage area number            
+ Save date                      2025-08-06T08:12:56.8302203+02:00
+ Classification                 NO
+ User name                      
+ User reference                 
+ Global coordinates   0.00000000E+00 0.00000000E+00
+ Number of magazines  1
+Magazin name          1           Magazine 1
+ Magazine type                  FS
+ Ammunition type                   
+ Remarks on mag                 BNS 20 fot          
+ Length of mag        6.05800000E+000
+ Width of mag         2.43800000E+000
+ Height of mag        2.59100000E+000
+ Cross section        6.31685800E+000
+ Magazine debris mas  4.80000000E+000
+ Magazine volume      3.82675258E+001
+ Cover depth          0.00000000E+000
+ Front thickness      0.00000000E+00
+ Back  thickness      0.00000000E+00
+ Roof thickness       0.00000000E+00
+ Wall thickness       0.00000000E+00
+ Density              0.00000000E+00
+ Chamber lining                   
+Coordinates x, y         2.12692496E+005     6.60795956E+006     0.00000000E+000
+Altitude & velocity      0.00000000E+000     0.00000000E+000
+Magazin direction        0.00000000E+000     0.00000000E+000
+Crater coordinats       0.0000000000E+00    0.0000000000E+00    0.0000000000E+00
+Crater 2nd point        0.0000000000E+00    0.0000000000E+00    0.0000000000E+00
+Block volume, b-area    0.0000000000E+00    0.0000000000E+00
+close dist,by-pass,t    0.0000000000E+00    0.0000000000E+00    0.0000000000E+00
+ Tunnel data          0
+Number of charges     1  1
+Charge data in mag    1     1.10000000E+001     1.00000000E+001     1.54000000E-004
+Probability calcul              U 11
+Remarks on charge   
+ Charge = chg ind r 
+ Defined situations   4
+Defined situations       3.75000000E-001 Night        N O
+Defined situations       2.97600000E-001 Day          D O
+Defined situations       1.48800000E-001 Evening      E O
+Defined situations       1.78600000E-001 Weekend      W O
+ Exposed objects       1
+Object name            1  Bolighus           Exposed object
+ Object ,person type            BNPF           NI                  
+ Number of persons       2.11000000E+000
+ Max precence            9.00000000E-001
+ Width of area           0.00000000E+000
+ Length of train         0.00000000E+000
+ Number trains/week      0.00000000E+000
+ Velocity of object      0.00000000E+000
+ Remarks on object                                                                                                                                                                                                
+ Nr object points     1
+Object points       NDNF   2.13240593E+005     6.60725237E+006     0.00000000E+000
+ Average precense               N 0.00000000E+000
+ Average precense               D 0.00000000E+000
+ Average precense               E 0.00000000E+000
+ Average precense               W 0.00000000E+000
