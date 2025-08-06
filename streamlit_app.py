@@ -323,7 +323,7 @@ st.download_button(
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 
 if st.button('Generer AMRISK-fil'):
-    if None in (oesting, nording, NEI) or output_csv.empty:
+    if None in (oesting, nording, NEI):
         st.warning("Mangler input")
         st.warning("Mangler input eller ingen eksponerte bygg")
     else:
