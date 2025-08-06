@@ -320,17 +320,19 @@ st.download_button(
    )
 
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
-base_text = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
-object_block = generate_exposed_objects(output_csv)
 
-final_file= base_text + "\n" + object_block
-
-
-st.download_button(
-   label="Export AMRISK2.5 file",
-   data=final_file.encode("utf-8"),
-   file_name='eksponerte_bygg.amr25',
-   on_click="ignore",
-   mime='text/csv',
-   icon=":material/download:",
-   )
+if st.button('prep AMR25'):
+    base_text = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
+    object_block = generate_exposed_objects(output_csv)
+    
+    final_file= base_text + "\n" + object_block
+    
+    
+    st.download_button(
+       label="Export AMRISK2.5 file",
+       data=final_file.encode("utf-8"),
+       file_name='eksponerte_bygg.amr25',
+       on_click="ignore",
+       mime='text/csv',
+       icon=":material/download:",
+       )
