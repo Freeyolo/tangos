@@ -260,6 +260,7 @@ with st.form("my_form"):
         brann = output[output['bygningstype'].str.startswith('8')]
         annet = output[output['bygningstype'].str.startswith('9')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
+        output_csv["geometry"] = output_csv["geometry"].astype(str)
         st.session_state['output_csv'] = output_csv
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
