@@ -319,15 +319,11 @@ st.download_button(
    icon=":material/download:",
    )
 
-# =============================================================================
-# Eksportering av data i amr2.5 format
-# =============================================================================
-
 st.download_button(
    label="Export AMRISK2.5 file",
    data="tralalalala",
    file_name='eksponerte_bygg.amr25',
    on_click="ignore",
-   mime='text/csv',
+   mime='text/plain',
    icon=":material/download:",
    )
