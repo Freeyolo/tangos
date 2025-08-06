@@ -311,36 +311,33 @@ def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return dinn.to_csv().encode('utf-8-sig')
 csv = convert_df(output_csv)
+st.download_button(
+   label="Download data as CSV",
+   data=csv,
+   file_name='eksponerte_bygg.csv',
+   on_click="ignore",
+   mime='text/csv',
+   icon=":material/download:",
+   )
 
-col1, col2 = st.columns(2)
-with col1:
+from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
+
+if st.button('Generer AMRISK-fil'):
+    if None in (oesting, nording, NEI) or output_csv.empty:
+        st.warning("Mangler input")
+        st.warning("Mangler input eller ingen eksponerte bygg")
+    else:
+        base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
+        objects = generate_exposed_objects(st.session_state['output_csv'])
+        st.session_state['amrisk_file'] = base + "\n" + objects
+        st.success("Fil generert")
+    
+if 'amrisk_file' in st.session_state:    
     st.download_button(
-       label="Download data as CSV",
-       data=csv,
-       file_name='eksponerte_bygg.csv',
+       label="Export AMRISK2.5 file",
+       data=st.session_state['amrisk_file'].encode("utf-8"),
+       file_name="amrisk_export.amr25",
        on_click="ignore",
        mime='text/csv',
        icon=":material/download:",
        )
-
-from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
-
-with col2:
-    if st.button('Generate AMRISK-file'):
-        if None in (oesting, nording, NEI) or output_csv.empty:
-            st.warning("Mangler input eller ingen eksponerte bygg")
-        else:
-            base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
-            objects = generate_exposed_objects(st.session_state['output_csv'])
-            st.session_state['amrisk_file'] = base + "\n" + objects
-            st.success("Fil generert")
-    if 'amrisk_file' in st.session_state:    
-        st.download_button(
-           label="Export AMRISK2.5 file",
-           data=st.session_state['amrisk_file'].encode("utf-8"),
-           file_name="amrisk_export.amr25",
-           on_click="ignore",
-           mime='text/csv',
-           icon=":material/download:",
-           disabled=st.session_state.get('amrisk_file') is None
-           )
