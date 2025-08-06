@@ -19,6 +19,7 @@ from io import BytesIO
 # st.set_page_config(layout="wide") #wide mode
 
 from streamlit_folium import st_folium
+from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -323,8 +324,6 @@ with col1:
        mime='text/csv',
        icon=":material/download:",
        )
-
-from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 
 with col2:
     if st.button('Generer AMRISK-fil'):
