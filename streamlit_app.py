@@ -312,7 +312,7 @@ def convert_df(dinn):
     return dinn.to_csv().encode('utf-8-sig')
 csv = convert_df(output_csv)
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 with col1:
     st.download_button(
        label="Download data as CSV",
@@ -324,6 +324,7 @@ with col1:
        )
 
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
+
 with col2:
     if st.button('Generer AMRISK-fil'):
         if None in (oesting, nording, NEI) or output_csv.empty:
@@ -333,7 +334,7 @@ with col2:
             objects = generate_exposed_objects(st.session_state['output_csv'])
             st.session_state['amrisk_file'] = base + "\n" + objects
             st.success("Fil generert")
-        
+with col3:   
     if 'amrisk_file' in st.session_state:    
         st.download_button(
            label="Export AMRISK2.5 file",
