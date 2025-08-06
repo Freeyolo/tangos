@@ -326,7 +326,7 @@ with col1:
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 
 with col2:
-    if st.button('Generer AMRISK-fil'):
+    if st.button('Generate AMRISK-file'):
         if None in (oesting, nording, NEI) or output_csv.empty:
             st.warning("Mangler input eller ingen eksponerte bygg")
         else:
