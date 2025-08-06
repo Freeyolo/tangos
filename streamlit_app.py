@@ -260,7 +260,7 @@ with st.form("my_form"):
         brann = output[output['bygningstype'].str.startswith('8')]
         annet = output[output['bygningstype'].str.startswith('9')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
-
+        st.session_state['output_csv'] = output_csv
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
@@ -325,8 +325,9 @@ if st.button('Generer AMRISK-fil'):
     if None in (oesting, nording, NEI):
         st.warning("Mangler input")
     else:
+        
         base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
-        objects = generate_exposed_objects(output_csv)
+        objects = generate_exposed_objects(st.session_state['output_csv'])
         st.session_state['amrisk_file'] = base + "\n" + objects
         st.success("Fil generert")
     
