@@ -324,6 +324,6 @@ st.download_button(
    data="tralalalala",
    file_name='eksponerte_bygg.amr25',
    on_click="ignore",
-   mime='text/plain',
+   mime='text/csv',
    icon=":material/download:",
    )
