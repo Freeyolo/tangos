@@ -97,7 +97,7 @@ def generate_exposed_objects(df):
         x, y = extract_coords(row["geometry"])
         x_fmt = format_amrisk_coord(x)
         y_fmt = format_amrisk_coord(y)
-        base_name = str(row["Navn"]).replace(" ", "_").replace(",", "_")[:50]
+        base_name = str(row["Navn"]).replace(" ", "_")[:50]
         object_name = f"{base_name}_{idx}"
 
         object_lines.extend([
