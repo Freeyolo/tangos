@@ -97,13 +97,14 @@ def generate_exposed_objects(df):
         x, y = extract_coords(row["geometry"])
         x_fmt = format_amrisk_coord(x)
         y_fmt = format_amrisk_coord(y)
-        object_name = str(row["Navn"]).replace(" ", "_").replace(",", "_")[:50]
+        base_name = str(row["Navn"]).replace(" ", "_").replace(",", "_")[:50]
+        object_name = f"{base_name}_{idx}"
 
         object_lines.extend([
             f"Object name            {idx+1}  {object_name} Exposed object ",
             " Object ,person type            BNPF           NI                  ",
-            " Number of persons       2.11000000E+000",
-            " Max precence            9.00000000E-001",
+            " Number of persons       0.00000000E+000",
+            " Max precence            0.00000000E+000",
             " Width of area           0.00000000E+000",
             " Length of train         0.00000000E+000",
             " Number trains/week      0.00000000E+000",
