@@ -329,6 +329,7 @@ with col2:
     if st.button('Generate AMRISK-file'):
         if None in (oesting, nording, NEI) or output_csv.empty:
             st.warning("Mangler input eller ingen eksponerte bygg")
+            st.session_state['amrisk_file'] = None
         else:
             base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
             objects = generate_exposed_objects(st.session_state['output_csv'])
