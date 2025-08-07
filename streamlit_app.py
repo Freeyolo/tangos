@@ -88,53 +88,43 @@ def get_veg_data(row):
     """Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
     https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/"""
     
-    nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
-    minx = row['minx']
-    miny = row['miny']
-    maxx = row['maxx']
-    maxy = row['maxy']
+    nvdb_base_url = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter'
+    ådt_url = f'{nvdb_base_url}/540' # ÅDT
+    fartsgrense_url = f'{nvdb_base_url}/105'  # Fartsgrense
+
+    minx, miny, maxx, maxy = row['minx'], row['miny'], row['maxx'], row['maxy']
 
     headers = {
-    'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
-    'X-Client': 'Utdrag ÅDT',
-    'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
+        'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
+        'X-Client': 'Utdrag ÅDT',
+        'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
     }
     params = {
         'srid': '5973',
         'inkluder': 'alle',
         'segmentering': 'true',
         'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
-        #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
     }
-    try:
-        response = requests.get(nvdburl, params=params, headers=headers)
-        response.raise_for_status()  # Raises HTTPError for bad responses
-        jsonResponse = response.json()
-        
-        # Check if the response contains objects
-        if 'objekter' not in jsonResponse:
-            return gpd.GeoDataFrame()  # Return empty GeoDataFrame if no objects
-        
-    except requests.exceptions.RequestException as err:
-        print ("Error:", err)
-        return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
-    except ValueError as v_err:
-        print ("Error decoding JSON:", v_err)
-        return gpd.GeoDataFrame()  # Return empty GeoDataFrame if JSON decoding fails
-        
-    # Initialize an empty list to store dictionaries
+
+    def fetch_nvdb_data(url):
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            return response.json().get('objekter', [])
+        except Exception as e:
+            print(f"Error fetching data from {url}: {e}")
+            return []
+
+    # Fetch ÅDT and Fartsgrense data
+    ådt_objects = fetch_nvdb_data(ådt_url)
+    fart_objects = fetch_nvdb_data(fartsgrense_url)
+
+    # Build GeoDataFrame from ÅDT
     vegdata_list = []
-    # Iterate through jsonResponse['objekter']
-    for vegobjekt in jsonResponse['objekter']:
+    for vegobjekt in ådt_objects:
         vegdata_dict = {'Vegobj_id': vegobjekt['id']}
-        
-        # Check if the 'geometry' key exists in vegobjekt
         if 'geometri' in vegobjekt and 'wkt' in vegobjekt['geometri']:
             vegdata_dict['geometry'] = vegobjekt['geometri']['wkt']
-        
-        # Append the dictionary to the list
-        vegdata_list.append(vegdata_dict)
-
         for egenskap in vegobjekt['egenskaper']:
             if egenskap['id'] == 4621:
                 vegdata_dict['ÅDT_år'] = egenskap['verdi']
@@ -142,21 +132,38 @@ def get_veg_data(row):
                 vegdata_dict['ÅDT_total'] = egenskap['verdi']
             if egenskap['id'] == 4625:
                 vegdata_dict['ÅDT_grunnlag'] = egenskap['verdi']
+        vegdata_list.append(vegdata_dict)
 
-    # Create a DataFrame from the list of dictionaries
     vegdata = pd.DataFrame(vegdata_list)
-    
-    # If the DataFrame is empty, return an empty GeoDataFrame
     if vegdata.empty:
         return gpd.GeoDataFrame()
-    
-    # If 'geometry' column exists, convert the 'wkt' strings to Shapely geometries
-    if 'geometry' in vegdata:
-        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
-    
-    # Create a GeoDataFrame from the DataFrame
-    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
-    
+
+    vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
+    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry', crs="EPSG:5973")
+
+    # Build GeoDataFrame from speed limits
+    fart_list = []
+    for obj in fart_objects:
+        fart_dict = {'Fartsgrense_id': obj['id']}
+        if 'geometri' in obj and 'wkt' in obj['geometri']:
+            fart_dict['geometry'] = obj['geometri']['wkt']
+        for egenskap in obj['egenskaper']:
+            if egenskap['id'] == 4540:
+                fart_dict['Fartsgrense'] = egenskap['verdi']
+        fart_list.append(fart_dict)
+
+    fart_df = pd.DataFrame(fart_list)
+    if fart_df.empty:
+        geo_veg_data['Fartsgrense'] = None
+        return geo_veg_data
+
+    fart_df['geometry'] = fart_df['geometry'].apply(wkt.loads)
+    geo_fart = gpd.GeoDataFrame(fart_df, geometry='geometry', crs="EPSG:5973")
+
+    # Spatial join: map speed limits to ÅDT segments
+    geo_veg_data = gpd.sjoin(geo_veg_data, geo_fart[['Fartsgrense', 'geometry']], how='left', predicate='intersects')
+    geo_veg_data.drop(columns='index_right', inplace=True)
+
     return geo_veg_data
   
 def incident_pressure(D):
