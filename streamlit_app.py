@@ -104,7 +104,6 @@ def get_veg_data(row):
         'inkluder': 'alle',
         'segmentering': 'true',
         'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
-        #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
     }
     try:
         response = requests.get(nvdburl, params=params, headers=headers)
