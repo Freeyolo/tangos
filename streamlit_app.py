@@ -155,7 +155,7 @@ def get_veg_data(row):
         vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
     
     # Create a GeoDataFrame from the DataFrame
-    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
+    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry', crs="EPSG:5973")
     
     # --- MINIMAL ADDITION: Fetch speed limit data ---
     try:
