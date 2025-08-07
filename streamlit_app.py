@@ -100,7 +100,7 @@ def get_veg_data(row):
     'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
     }
     params = {
-        'srid': '5973',
+        'srid': '5973', #angir georafisk referansesystem
         'inkluder': 'alle',
         'segmentering': 'true',
         'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
