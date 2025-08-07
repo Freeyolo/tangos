@@ -89,6 +89,7 @@ def get_veg_data(row):
     https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/"""
     
     nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
+    fartsurl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/105'  # 105 = Fartsgrense
     minx = row['minx']
     miny = row['miny']
     maxx = row['maxx']
@@ -156,6 +157,42 @@ def get_veg_data(row):
     # Create a GeoDataFrame from the DataFrame
     geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
     
+    # --- MINIMAL ADDITION: Fetch speed limit data ---
+    try:
+        fart_response = requests.get(fartsurl, params=params, headers=headers)
+        fart_response.raise_for_status()
+        fart_json = fart_response.json()
+        if 'objekter' not in fart_json:
+            geo_veg_data['Fartsgrense'] = None
+            return geo_veg_data
+    except Exception as err:
+        print("Error fetching speed limits:", err)
+        geo_veg_data['Fartsgrense'] = None
+        return geo_veg_data
+
+    fart_list = []
+    for obj in fart_json['objekter']:
+        fart_dict = {}
+        if 'geometri' in obj and 'wkt' in obj['geometri']:
+            fart_dict['geometry'] = obj['geometri']['wkt']
+        for egenskap in obj['egenskaper']:
+            if egenskap['id'] == 4540:
+                fart_dict['Fartsgrense'] = egenskap['verdi']
+        if 'geometry' in fart_dict and 'Fartsgrense' in fart_dict:
+            fart_list.append(fart_dict)
+
+    fart_df = pd.DataFrame(fart_list)
+    if fart_df.empty:
+        geo_veg_data['Fartsgrense'] = None
+        return geo_veg_data
+
+    fart_df['geometry'] = fart_df['geometry'].apply(wkt.loads)
+    geo_fart = gpd.GeoDataFrame(fart_df, geometry='geometry', crs="EPSG:5973")
+
+    # Spatial join to add Fartsgrense to geo_veg_data
+    geo_veg_data = gpd.sjoin(geo_veg_data, geo_fart[['geometry', 'Fartsgrense']], how='left', predicate='intersects')
+    geo_veg_data.drop(columns='index_right', inplace=True)
+
     return geo_veg_data
   
 def incident_pressure(D):
