@@ -190,9 +190,12 @@ def get_veg_data(row):
     geo_fart = gpd.GeoDataFrame(fart_df, geometry='geometry', crs="EPSG:5973")
 
     # Spatial join to add Fartsgrense to geo_veg_data
-    geo_veg_data = gpd.sjoin(geo_veg_data, geo_fart[['geometry', 'Fartsgrense']], how='left', predicate='intersects')
-    geo_veg_data.drop(columns='index_right', inplace=True)
-
+    geo_veg_data = gpd.overlay(
+        geo_veg_data,
+        geo_fart[['geometry', 'Fartsgrense']],
+        how='intersection'
+    )
+    
     return geo_veg_data
   
 def incident_pressure(D):
