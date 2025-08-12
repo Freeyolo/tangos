@@ -35,11 +35,17 @@ def QD_func(NEI):
     QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
 
-def incident_pressure(D):
-    """Create a function that uses the scaled distance (Z) to calculate the incident 
-    pressure in kPa from the simplified Kingery & Bulmash polynomials
-    provided by Swisdak, M. in 1994 the input is the distance and net eksplosive content (NEI) in TNT equivalents
-    returns pressure in kPa"""
+def incident_pressure(D,NEI):
+    """
+    Incident overpressure (kPa) from simplified Kingery–Bulmash (Swisdak, 1994).
+    Inputs:
+      D   : distance (m)
+      NEI : net explosive content (kg TNT eq)
+    Returns:
+      pressure in kPa (float). np.nan if inputs invalid.
+    """
+    if NEI is None or NEI <= 0 or D is None or D <= 0:
+        return np.nan
 
     Z = D/NEI**(1/3) #scaled distance
 
@@ -132,7 +138,7 @@ with tab1:
             output.drop(columns=['Kodeverdi'], inplace=True) #fjern unødvendig kolonne
     
             output['avstand m'] = round(output.distance(gdf.iloc[0]['geometry'])) #regn ut avstanden til eksplosivlageret
-            output['trykk kPa'] = output['avstand m'].apply(incident_pressure).round(2) #regner ut trykket og runder av til to desimaler
+            output['trykk kPa'] = output['avstand m'].apply(incident_pressure,args=[NEI]).round(2) #regner ut trykket og runder av til to desimaler
     
             output['bygningstype'] = output['bygningstype'].astype(str) # Convert 'bygningstype' column to string type
             boliger = output[output['bygningstype'].str.startswith('1')]
