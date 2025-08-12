@@ -218,6 +218,28 @@ with tab2:
         st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
         st.stop()
     st.dataframe(data=st.session_state['output_csv'], column_config={'bygningstype':None, 'geometry':None})
+    
+    df = st.session_state.get('output_csv', pd.DataFrame()).copy()
+    
+    # Always add the checkbox column (defaults to checked)
+    df['include'] = True
+    
+    edited = st.data_editor(
+        df,
+        key="editor_output_csv",
+        use_container_width=True,
+        column_config={
+            'include': st.column_config.CheckboxColumn(
+                "Include",
+                help="Huk av for å ta med bygget i AMRISK-eksporten",
+                default=True,
+            ),
+            'geometry': None,
+            'bygningstype': None,
+        },
+        column_order=['include'] + [c for c in df.columns if c != 'include'],
+    )
+
     if st.button('Generer AMRISK-fil'):
         if None in (oesting, nording, NEI):
             st.warning("Mangler input eller ingen eksponerte bygg")
