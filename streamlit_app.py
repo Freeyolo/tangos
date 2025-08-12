@@ -217,7 +217,7 @@ with tab2:
     if (st.session_state.get("last_inputs") and st.session_state.get("last_inputs").get("NEI")) is None:
         st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
         st.stop()
-    st.dataframe(data=st.session_state['output_csv'])
+    st.dataframe(data=st.session_state['output_csv'], column_config={'geometry':None})
     if st.button('Generer AMRISK-fil'):
         if None in (oesting, nording, NEI):
             st.warning("Mangler input eller ingen eksponerte bygg")
