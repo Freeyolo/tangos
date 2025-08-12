@@ -238,7 +238,9 @@ with tab2:
         },
         column_order=['Inkluder'] + [c for c in amrdataframe.columns if c != 'Inkluder'],
     )
-
+    
+    st.session_state['output_csv'] = edited
+    
     if st.button('Generer AMRISK-fil'):
         if None in (oesting, nording, NEI):
             st.warning("Mangler input eller ingen eksponerte bygg")
