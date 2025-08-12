@@ -337,7 +337,7 @@ with tab1:
     
             folium.LayerControl().add_to(kartpunkt)
             st_kart = st_folium(kartpunkt,width=672,zoom=13)
-            st.session_state('foliummap') = st_kart  
+            st_session_state('foliummap') = st_kart  
         else:
             output_csv = pd.DataFrame()
             st.write('Ingen bygninger eksponert :sunglasses:')
@@ -348,7 +348,7 @@ with tab1:
             kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
             kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='black'),name ='QDvei',control=False)
             st_kart = st_folium(kartpunkt,width=672,zoom=13)
-            st.session_state('foliummap') = st_kart  
+            st_session_state('foliummap') = st_kart  
     # =============================================================================
     # Eksportering av data i CSV format
     # =============================================================================
