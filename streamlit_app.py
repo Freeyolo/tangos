@@ -17,6 +17,7 @@ from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 from get_veg_data import get_veg_data
 from get_matrikkel_data import get_matrikkel_data
 from blast_model import incident_pressure
+from get_nettanlegg_data import get_nettanlegg_data
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -88,6 +89,27 @@ with tab1:
         #dataframe med vegsegmenter som har ÅDT innenfor sikkerhetsavstandene       
         result_veg_geodataframe = get_veg_data(gdf_vei_bbox.iloc[0])
     
+        #dataframe med nettanlegg som innenfor sikkerhetsavstandene
+        result_nettanlegg_geodataframe = get_nettanlegg_data(gdf_syk_bbox.iloc[0])
+        
+        if not result_nettanlegg_geodataframe.empty:
+            # Splitt Multi-geometry -> single parts, og nullstill indeks
+            nettanlegg = result_nettanlegg_geodataframe.explode(index_parts=False).reset_index(drop=True)
+        
+            # Ikke rør nettanlegg.crs her (den er allerede EPSG:25833)
+            # Hvis du VIL reprojisere selv i stedet for at .explore gjør det automatisk:
+            # nettanlegg = nettanlegg.to_crs("EPSG:4326")
+        
+            # Legg på eksisterende Folium-kart (kartpunkt) og gi grå stil
+            kart_nettanlegg = nettanlegg.explore(
+                m=kartpunkt,
+                style_kwds=dict(color="grey"),
+                name="Nettanlegg"
+            )
+        
+            # (valgfritt) legg på lagkontroll
+            folium.LayerControl(collapsed=False).add_to(kart_nettanlegg)
+        
         if not result_veg_geodataframe.empty:
             vegsegmenter = result_veg_geodataframe.explode(ignore_index=True)
             vegsegmenter.crs = 'EPSG:32633'
