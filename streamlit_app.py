@@ -337,7 +337,7 @@ with tab1:
     
             folium.LayerControl().add_to(kartpunkt)
             st_kart = st_folium(kartpunkt,width=672,zoom=13)
-              
+            st_session_state('foliummap') =st_kart  
         else:
             output_csv = pd.DataFrame()
             st.write('Ingen bygninger eksponert :sunglasses:')
@@ -348,7 +348,7 @@ with tab1:
             kartQDbol = gdf_bolig.explore(m=kartpunkt,style_kwds=dict(fill=False,color='orange'),name ='QDbolig',control=False)
             kartQDvei = gdf_vei.explore(m=kartpunkt,style_kwds=dict(fill=False,color='black'),name ='QDvei',control=False)
             st_kart = st_folium(kartpunkt,width=672,zoom=13)
-     
+            st_session_state('foliummap') =st_kart  
     # =============================================================================
     # Eksportering av data i CSV format
     # =============================================================================
@@ -359,28 +359,27 @@ with tab1:
         return dinn.to_csv().encode('utf-8-sig')
     csv = convert_df(output_csv)
  
-st.download_button(
-   label="Download data as CSV",
-   data=csv,
-   file_name='eksponerte_bygg.csv',
-   on_click="ignore",
-   mime='text/csv',
-   icon=":material/download:",
-   )
-
-st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI}
+    st.download_button(
+       label="Download data as CSV",
+       data=csv,
+       file_name='eksponerte_bygg.csv',
+       on_click="ignore",
+       mime='text/csv',
+       icon=":material/download:",
+       )
+    
+    st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI}
 # =============================================================================
 # TAB 2 – AMRISK: parametre, generering og eksport
-# =============================================================================
-
-    
-
+# ============================================================================= 
 
 
 with tab2:
     if (st.session_state.get("last_inputs") and st.session_state.get("last_inputs").get("NEI")) is None:
-        st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
+        st.warning("Mangler input")
         st.stop()
+    st_folium(st.session_state('foliummap'))
+    
     if st.button('Generer AMRISK-fil'):
         if None in (oesting, nording, NEI):
             st.warning("Mangler input eller ingen eksponerte bygg")
