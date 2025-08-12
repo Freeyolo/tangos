@@ -20,6 +20,7 @@ from io import BytesIO
 
 from streamlit_folium import st_folium
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
+from get_veg_data import get_veg_data
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -83,120 +84,6 @@ def get_matrikkel_data(row):
         # Handle other exceptions, print the error message, and return an empty GeoDataFrame
         print(f"An unexpected error occurred: {e}")
         return gpd.GeoDataFrame()
-
-def get_veg_data(row):
-    """Denne funksjonen bruker SVV NVDB API til å finne alle veier og ÅDT innenfor en bounding box
-    https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/"""
-    
-    nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
-    fartsurl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/105'  # 105 = Fartsgrense
-    minx = row['minx']
-    miny = row['miny']
-    maxx = row['maxx']
-    maxy = row['maxy']
-
-    headers = {
-    'accept': 'application/vnd.vegvesen.nvdb-v3-rev1+json',
-    'X-Client': 'Utdrag ÅDT',
-    'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
-    }
-    params = {
-        'srid': '5973', #angir georafisk referansesystem
-        'inkluder': 'alle',
-        'segmentering': 'true',
-        'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
-    }
-    try:
-        response = requests.get(nvdburl, params=params, headers=headers)
-        response.raise_for_status()  # Raises HTTPError for bad responses
-        jsonResponse = response.json()
-        
-        # Check if the response contains objects
-        if 'objekter' not in jsonResponse:
-            return gpd.GeoDataFrame()  # Return empty GeoDataFrame if no objects
-        
-    except requests.exceptions.RequestException as err:
-        print ("Error:", err)
-        return gpd.GeoDataFrame()  # Return empty GeoDataFrame on error
-    except ValueError as v_err:
-        print ("Error decoding JSON:", v_err)
-        return gpd.GeoDataFrame()  # Return empty GeoDataFrame if JSON decoding fails
-        
-    # Initialize an empty list to store dictionaries
-    vegdata_list = []
-    # Iterate through jsonResponse['objekter']
-    for vegobjekt in jsonResponse['objekter']:
-        vegdata_dict = {'Vegobj_id': vegobjekt['id']}
-        
-        # Check if the 'geometry' key exists in vegobjekt
-        if 'geometri' in vegobjekt and 'wkt' in vegobjekt['geometri']:
-            vegdata_dict['geometry'] = vegobjekt['geometri']['wkt']
-        
-        # Append the dictionary to the list
-        vegdata_list.append(vegdata_dict)
-
-        for egenskap in vegobjekt['egenskaper']:
-            if egenskap['id'] == 4621:
-                vegdata_dict['ÅDT_år'] = egenskap['verdi']
-            if egenskap['id'] == 4623:
-                vegdata_dict['ÅDT_total'] = egenskap['verdi']
-            if egenskap['id'] == 4625:
-                vegdata_dict['ÅDT_grunnlag'] = egenskap['verdi']
-
-    # Create a DataFrame from the list of dictionaries
-    vegdata = pd.DataFrame(vegdata_list)
-    
-    # If the DataFrame is empty, return an empty GeoDataFrame
-    if vegdata.empty:
-        return gpd.GeoDataFrame()
-    
-    # If 'geometry' column exists, convert the 'wkt' strings to Shapely geometries
-    if 'geometry' in vegdata:
-        vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
-    
-    # Create a GeoDataFrame from the DataFrame
-    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry', crs="EPSG:5973")
-    
-    # --- MINIMAL ADDITION: Fetch speed limit data ---
-    try:
-        fart_response = requests.get(fartsurl, params=params, headers=headers)
-        fart_response.raise_for_status()
-        fart_json = fart_response.json()
-        if 'objekter' not in fart_json:
-            geo_veg_data['Fartsgrense'] = None
-            return geo_veg_data
-    except Exception as err:
-        print("Error fetching speed limits:", err)
-        geo_veg_data['Fartsgrense'] = None
-        return geo_veg_data
-
-    fart_list = []
-    for obj in fart_json['objekter']:
-        fart_dict = {}
-        if 'geometri' in obj and 'wkt' in obj['geometri']:
-            fart_dict['geometry'] = obj['geometri']['wkt']
-        for egenskap in obj['egenskaper']:
-            if egenskap['id'] == 2021:
-                fart_dict['Fartsgrense'] = egenskap['verdi']
-        if 'geometry' in fart_dict and 'Fartsgrense' in fart_dict:
-            fart_list.append(fart_dict)
-
-    fart_df = pd.DataFrame(fart_list)
-    if fart_df.empty:
-        geo_veg_data['Fartsgrense'] = None
-        return geo_veg_data
-
-    fart_df['geometry'] = fart_df['geometry'].apply(wkt.loads)
-    geo_fart = gpd.GeoDataFrame(fart_df, geometry='geometry', crs="EPSG:5973")
-
-    # Spatial join to add Fartsgrense to geo_veg_data
-    geo_veg_data = gpd.overlay(
-        geo_veg_data,
-        geo_fart[['geometry', 'Fartsgrense']],
-        how='intersection'
-    )
-    
-    return geo_veg_data
   
 def incident_pressure(D):
     """Create a function that uses the scaled distance (Z) to calculate the incident 
@@ -238,7 +125,8 @@ with tab1:
        nording = st.number_input('Nording / Y', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
        oesting = st.number_input('Østing / X', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
        NEI = st.number_input('Totalvekt', value=None, step=1, min_value=1, max_value=100000, placeholder='Netto eksplosivinnhold (NEI) i kg')
-    
+       st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI}
+       
        # Every form must have a submit button.
        submitted = st.form_submit_button("Submit")
        if submitted:
@@ -359,23 +247,21 @@ with tab1:
         return dinn.to_csv().encode('utf-8-sig')
     csv = convert_df(output_csv)
  
-st.download_button(
-   label="Download data as CSV",
-   data=csv,
-   file_name='eksponerte_bygg.csv',
-   on_click="ignore",
-   mime='text/csv',
-   icon=":material/download:",
-   )
-
-st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI}
+    st.download_button(
+       label="Download data as CSV",
+       data=csv,
+       file_name='eksponerte_bygg.csv',
+       on_click="ignore",
+       mime='text/csv',
+       icon=":material/download:",
+       )
+    
+    
 # =============================================================================
 # TAB 2 – AMRISK: parametre, generering og eksport
 # =============================================================================
 
     
-
-
 
 with tab2:
     if (st.session_state.get("last_inputs") and st.session_state.get("last_inputs").get("NEI")) is None:
