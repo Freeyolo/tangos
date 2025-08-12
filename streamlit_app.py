@@ -191,6 +191,7 @@ with tab2:
         st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
         st.stop()
     
+    st_folium(st.session_state['folium_map'], width=672, zoom=13, key="map_tab2")
     amrdataframe = st.session_state.get('output_csv', pd.DataFrame()).copy()
     
     # Always add the checkbox column (defaults to checked)
