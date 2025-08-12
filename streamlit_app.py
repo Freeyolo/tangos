@@ -8,11 +8,8 @@ Program som tar et koordinat (EPSG:32633 – WGS 84 / UTM zone 33N) og en eksplo
 import pandas as pd
 import geopandas as gpd
 import folium
-from folium.plugins import MarkerCluster
-import os
 import numpy as np
 import requests
-from shapely import wkt
 import streamlit as st
 from io import BytesIO
 
