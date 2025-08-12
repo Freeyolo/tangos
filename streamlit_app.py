@@ -245,10 +245,15 @@ with tab2:
         if None in (oesting, nording, NEI):
             st.warning("Mangler input eller ingen eksponerte bygg")
         else:
-            base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
-            objects = generate_exposed_objects(st.session_state['output_csv'])
-            st.session_state['amrisk_file'] = base + "\n" + objects
-            st.success("Fil generert")
+            # only included rows
+            to_export = edited[edited['include']].drop(columns=['include'], errors='ignore')
+            if to_export.empty:
+                st.warning("Ingen rader valgt for eksport.")
+            else:
+                base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
+                objects = generate_exposed_objects(to_export)
+                st.session_state['amrisk_file'] = base + "\n" + objects
+                st.success("Fil generert")
             
     if 'amrisk_file' in st.session_state:    
         st.download_button(
