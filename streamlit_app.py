@@ -18,6 +18,7 @@ from io import BytesIO
 from streamlit_folium import st_folium
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 from get_veg_data import get_veg_data
+from get_matrikkel_data import get_matrikkel_data
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -34,54 +35,6 @@ def QD_func(NEI):
     QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
 
-def get_matrikkel_data(row):
-    """Denne funksjonen bruker kartverkets API til å finne alle bygninger innenfor en bounding box"""
-    wfs_url = "https://wfs.geonorge.no/skwms1/wfs.matrikkelen-bygningspunkt?"
-
-    minx = row['minx']
-    miny = row['miny']
-    maxx = row['maxx']
-    maxy = row['maxy']
-
-    bbox_str = f'{minx},{miny},{maxx},{maxy},EPSG:32633'
-
-    params = {
-        'service': 'WFS',
-        'version': '2.0.0',
-        'request': 'GetFeature',
-        'typename': 'app:Bygning',
-        'srsname': 'EPSG:32633',
-        'outputformat': 'application/gml+xml; version=3.2',
-        'bbox': bbox_str,
-        #'count': '100', reduce output count
-    }
-
-
-    try:
-        response = requests.get(wfs_url, params=params)
-        response.raise_for_status()  # Raises HTTPError for bad responses
-    except requests.exceptions.HTTPError as errh:
-        print ("HTTP Error:",errh)
-    except requests.exceptions.ConnectionError as errc:
-        print ("Error Connecting:",errc)
-    except requests.exceptions.Timeout as errt:
-        print ("Timeout Error:",errt)
-    except requests.exceptions.RequestException as err:
-        print ("Error:",err)
-
-    try:
-        # Load the GML response into a GeoDataFrame
-        matrikkel_data = gpd.read_file(BytesIO(response.content))
-        return matrikkel_data
-    except ValueError as ve:
-        # Handle ValueError, print the error message, and return an empty GeoDataFrame
-        print(f"ValueError: {ve}")
-        return gpd.GeoDataFrame()
-    except Exception as e:
-        # Handle other exceptions, print the error message, and return an empty GeoDataFrame
-        print(f"An unexpected error occurred: {e}")
-        return gpd.GeoDataFrame()
-  
 def incident_pressure(D):
     """Create a function that uses the scaled distance (Z) to calculate the incident 
     pressure in kPa from the simplified Kingery & Bulmash polynomials
