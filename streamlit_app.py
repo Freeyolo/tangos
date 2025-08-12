@@ -236,7 +236,7 @@ with tab2:
             'geometry': None,
             'bygningstype': None,
         },
-        column_order=['Inkluder'] + [c for c in df.columns if c != 'Inkluder'],
+        column_order=['Inkluder'] + [c for c in amrdataframe.columns if c != 'Inkluder'],
     )
 
     if st.button('Generer AMRISK-fil'):
