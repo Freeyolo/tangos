@@ -218,25 +218,25 @@ with tab2:
         st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
         st.stop()
     
-    df = st.session_state.get('output_csv', pd.DataFrame()).copy()
+    amrdataframe = st.session_state.get('output_csv', pd.DataFrame()).copy()
     
     # Always add the checkbox column (defaults to checked)
-    df['include'] = True
+    amrdataframe['Inkluder'] = True
     
     edited = st.data_editor(
-        df,
+        amrdataframe,
         key="editor_output_csv",
         use_container_width=True,
         column_config={
-            'include': st.column_config.CheckboxColumn(
-                "Include",
+            'Inkluder': st.column_config.CheckboxColumn(
+                "Inkluder",
                 help="Huk av for å ta med bygget i AMRISK-eksporten",
                 default=True,
             ),
             'geometry': None,
             'bygningstype': None,
         },
-        column_order=['include'] + [c for c in df.columns if c != 'include'],
+        column_order=['Inkluder'] + [c for c in df.columns if c != 'Inkluder'],
     )
 
     if st.button('Generer AMRISK-fil'):
