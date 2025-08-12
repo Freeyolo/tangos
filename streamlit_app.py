@@ -227,6 +227,11 @@ def incident_pressure(D):
     return (np.exp(Az+Bz*np.log(Z) + Cz * (np.log(Z))**2+ Dz * (np.log(Z))**3+ Ez * (np.log(Z))**4))
 
 tab1, tab2 = st.tabs(['Input','Amrisk'])
+
+# =============================================================================
+# TAB 1 – Input, beregninger og kart
+# =============================================================================
+
 with tab1:
     with st.form("my_form"):
        st.write("Input data")
@@ -353,38 +358,44 @@ with tab1:
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return dinn.to_csv().encode('utf-8-sig')
     csv = convert_df(output_csv)
+ 
+st.download_button(
+   label="Download data as CSV",
+   data=csv,
+   file_name='eksponerte_bygg.csv',
+   on_click="ignore",
+   mime='text/csv',
+   icon=":material/download:",
+   )
+
+st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI}
+# =============================================================================
+# TAB 2 – AMRISK: parametre, generering og eksport
+# =============================================================================
+
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
+
+
+
+with tab2:
+    if (st.session_state.get("last_inputs") and st.session_state.get("last_inputs").get("NEI")) is None:
+        st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
+        st.stop()
+    if st.button('Generer AMRISK-fil'):
+        if None in (oesting, nording, NEI):
+            st.warning("Mangler input eller ingen eksponerte bygg")
+        else:
+            base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
+            objects = generate_exposed_objects(st.session_state['output_csv'])
+            st.session_state['amrisk_file'] = base + "\n" + objects
+            st.success("Fil generert")
+            
+    if 'amrisk_file' in st.session_state:    
         st.download_button(
-           label="Download data as CSV",
-           data=csv,
-           file_name='eksponerte_bygg.csv',
+           label="Export AMRISK2.5 file",
+           data=st.session_state['amrisk_file'].encode("utf-8"),
+           file_name="amrisk_export.amr25",
            on_click="ignore",
            mime='text/csv',
            icon=":material/download:",
            )
-    
-    with col2:
-        if st.button('Generer AMRISK-fil'):
-            if None in (oesting, nording, NEI):
-                st.warning("Mangler input eller ingen eksponerte bygg")
-            else:
-                base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
-                objects = generate_exposed_objects(st.session_state['output_csv'])
-                st.session_state['amrisk_file'] = base + "\n" + objects
-                st.success("Fil generert")
-            
-        if 'amrisk_file' in st.session_state:    
-            st.download_button(
-               label="Export AMRISK2.5 file",
-               data=st.session_state['amrisk_file'].encode("utf-8"),
-               file_name="amrisk_export.amr25",
-               on_click="ignore",
-               mime='text/csv',
-               icon=":material/download:",
-               )
-
-with tab2:
-        st.write("blablabla")
