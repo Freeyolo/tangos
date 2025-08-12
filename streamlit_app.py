@@ -13,6 +13,7 @@ import streamlit as st
 # st.set_page_config(layout="wide") #wide mode
 
 from streamlit_folium import st_folium
+from streamlit.components.v1 import html
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 from get_veg_data import get_veg_data
 from get_matrikkel_data import get_matrikkel_data
@@ -191,7 +192,7 @@ with tab2:
         st.warning("Fyll inn data i fanen 'Input' først og kjør beregning.")
         st.stop()
     
-    st_folium(st.session_state['folium_map'], width=672, zoom=13, key="map_tab2")
+    html(st.session_state['folium_map']._repr_html_(), height=500)
     amrdataframe = st.session_state.get('output_csv', pd.DataFrame()).copy()
     
     # Always add the checkbox column (defaults to checked)
