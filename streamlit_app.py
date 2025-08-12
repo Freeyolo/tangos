@@ -19,6 +19,7 @@ from io import BytesIO
 # st.set_page_config(layout="wide") #wide mode
 
 from streamlit_folium import st_folium
+from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -88,6 +89,7 @@ def get_veg_data(row):
     https://nvdbapiles-v3.atlas.vegvesen.no/dokumentasjon/"""
     
     nvdburl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/540' #540 er ÅDT
+    fartsurl = 'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/105'  # 105 = Fartsgrense
     minx = row['minx']
     miny = row['miny']
     maxx = row['maxx']
@@ -99,11 +101,10 @@ def get_veg_data(row):
     'X-Client-Session': '402b9aee-16f9-e38d-2ce7-cd6bc20eb3e3'
     }
     params = {
-        'srid': '5973',
+        'srid': '5973', #angir georafisk referansesystem
         'inkluder': 'alle',
         'segmentering': 'true',
         'kartutsnitt': f'{minx},{miny},{maxx},{maxy}',
-        #'polygon': '20000.0 6520000.0,20500.0 6520000.0,21000.0 6500000.0,20000.0 6520000.0',
     }
     try:
         response = requests.get(nvdburl, params=params, headers=headers)
@@ -154,7 +155,46 @@ def get_veg_data(row):
         vegdata['geometry'] = vegdata['geometry'].apply(wkt.loads)
     
     # Create a GeoDataFrame from the DataFrame
-    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry')
+    geo_veg_data = gpd.GeoDataFrame(vegdata, geometry='geometry', crs="EPSG:5973")
+    
+    # --- MINIMAL ADDITION: Fetch speed limit data ---
+    try:
+        fart_response = requests.get(fartsurl, params=params, headers=headers)
+        fart_response.raise_for_status()
+        fart_json = fart_response.json()
+        if 'objekter' not in fart_json:
+            geo_veg_data['Fartsgrense'] = None
+            return geo_veg_data
+    except Exception as err:
+        print("Error fetching speed limits:", err)
+        geo_veg_data['Fartsgrense'] = None
+        return geo_veg_data
+
+    fart_list = []
+    for obj in fart_json['objekter']:
+        fart_dict = {}
+        if 'geometri' in obj and 'wkt' in obj['geometri']:
+            fart_dict['geometry'] = obj['geometri']['wkt']
+        for egenskap in obj['egenskaper']:
+            if egenskap['id'] == 2021:
+                fart_dict['Fartsgrense'] = egenskap['verdi']
+        if 'geometry' in fart_dict and 'Fartsgrense' in fart_dict:
+            fart_list.append(fart_dict)
+
+    fart_df = pd.DataFrame(fart_list)
+    if fart_df.empty:
+        geo_veg_data['Fartsgrense'] = None
+        return geo_veg_data
+
+    fart_df['geometry'] = fart_df['geometry'].apply(wkt.loads)
+    geo_fart = gpd.GeoDataFrame(fart_df, geometry='geometry', crs="EPSG:5973")
+
+    # Spatial join to add Fartsgrense to geo_veg_data
+    geo_veg_data = gpd.overlay(
+        geo_veg_data,
+        geo_fart[['geometry', 'Fartsgrense']],
+        how='intersection'
+    )
     
     return geo_veg_data
   
@@ -188,9 +228,9 @@ def incident_pressure(D):
 
 with st.form("my_form"):
    st.write("Input data")
-   nording = st.number_input('Nording', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
-   oesting = st.number_input('Østing', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
-   NEI = st.number_input('Totalvekt', value='min', step=500, min_value=1, max_value=100000, help='Netto eksplosivinnhold (NEI) i kg')
+   nording = st.number_input('Nording / Y', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
+   oesting = st.number_input('Østing / X', value=None, step=1, placeholder='EPSG:32633 - WGS 84 / UTM zone 33N')
+   NEI = st.number_input('Totalvekt', value=None, step=1, min_value=1, max_value=100000, placeholder='Netto eksplosivinnhold (NEI) i kg')
 
    # Every form must have a submit button.
    submitted = st.form_submit_button("Submit")
@@ -260,7 +300,8 @@ with st.form("my_form"):
         brann = output[output['bygningstype'].str.startswith('8')]
         annet = output[output['bygningstype'].str.startswith('9')]
         output_csv = pd.DataFrame(output)  # convert back to pandas dataframe
-
+        output_csv["geometry"] = output_csv["geometry"].astype(str)
+        st.session_state['output_csv'] = output_csv
         # =============================================================================
         # Plotting av matrikkeldata i kart og lagring av kartet
         # =============================================================================
@@ -310,9 +351,35 @@ def convert_df(dinn):
 # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return dinn.to_csv().encode('utf-8-sig')
 csv = convert_df(output_csv)
-st.download_button(
-   label="Download data as CSV",
-   data=csv,
-   file_name='eksponerte_bygg.csv',
-   mime='text/csv',
-   )
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.download_button(
+       label="Download data as CSV",
+       data=csv,
+       file_name='eksponerte_bygg.csv',
+       on_click="ignore",
+       mime='text/csv',
+       icon=":material/download:",
+       )
+
+with col2:
+    if st.button('Generer AMRISK-fil'):
+        if None in (oesting, nording, NEI):
+            st.warning("Mangler input eller ingen eksponerte bygg")
+        else:
+            base = generate_amrisk_base_file(coord_x=oesting, coord_y=nording, charge_kg=NEI)
+            objects = generate_exposed_objects(st.session_state['output_csv'])
+            st.session_state['amrisk_file'] = base + "\n" + objects
+            st.success("Fil generert")
+        
+    if 'amrisk_file' in st.session_state:    
+        st.download_button(
+           label="Export AMRISK2.5 file",
+           data=st.session_state['amrisk_file'].encode("utf-8"),
+           file_name="amrisk_export.amr25",
+           on_click="ignore",
+           mime='text/csv',
+           icon=":material/download:",
+           )
