@@ -246,7 +246,7 @@ with tab2:
             st.warning("Mangler input eller ingen eksponerte bygg")
         else:
             # only included rows
-            to_export = edited[edited['include']].drop(columns=['include'], errors='ignore')
+            to_export = edited[edited['Inkluder']].drop(columns=['Inkluder'], errors='ignore')
             if to_export.empty:
                 st.warning("Ingen rader valgt for eksport.")
             else:
