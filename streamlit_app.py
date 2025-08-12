@@ -8,10 +8,7 @@ Program som tar et koordinat (EPSG:32633 – WGS 84 / UTM zone 33N) og en eksplo
 import pandas as pd
 import geopandas as gpd
 import folium
-import numpy as np
-import requests
 import streamlit as st
-from io import BytesIO
 
 # st.set_page_config(layout="wide") #wide mode
 
@@ -19,6 +16,7 @@ from streamlit_folium import st_folium
 from amr25filecreator import generate_amrisk_base_file, generate_exposed_objects
 from get_veg_data import get_veg_data
 from get_matrikkel_data import get_matrikkel_data
+from blast_model import incident_pressure
 
 output = pd.DataFrame()
 output_csv = pd.DataFrame()
@@ -34,40 +32,6 @@ def QD_func(NEI):
     QD_bolig = max(round(22.2 * NEI ** (1/3)), 400)
     QD_vei = max(round(14.8 * NEI ** (1/3)), 180)
     return QD_syk, QD_bolig, QD_vei
-
-def incident_pressure(D,NEI):
-    """
-    Incident overpressure (kPa) from simplified Kingery–Bulmash (Swisdak, 1994).
-    Inputs:
-      D   : distance (m)
-      NEI : net explosive content (kg TNT eq)
-    Returns:
-      pressure in kPa (float). np.nan if inputs invalid.
-    """
-    if NEI is None or NEI <= 0 or D is None or D <= 0:
-        return np.nan
-
-    Z = D/NEI**(1/3) #scaled distance
-
-    if Z <= 2.9:
-        Az = 7.2106
-        Bz = -2.1069
-        Cz = -0.3229
-        Dz = 0.1117
-        Ez = 0.0685
-    elif Z <= 23.8:
-        Az = 7.5938
-        Bz = -3.0523
-        Cz = 0.40977
-        Dz = 0.0261
-        Ez = -0.01267
-    elif Z > 23.8:
-        Az = 6.0536
-        Bz = -1.4066
-        Cz = 0
-        Dz = 0
-        Ez = 0
-    return (np.exp(Az+Bz*np.log(Z) + Cz * (np.log(Z))**2+ Dz * (np.log(Z))**3+ Ez * (np.log(Z))**4))
 
 tab1, tab2 = st.tabs(['Input','Amrisk'])
 
