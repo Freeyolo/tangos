@@ -58,7 +58,7 @@ with tab1:
            missing.append("Totalvekt (NEI)")
            
         if missing:
-            st.error("Mangler følgende" + ", ".join(missing))
+            st.error("Mangler følgende: " + ", ".join(missing))
             st.stop()
         st.session_state["last_inputs"] = {"oesting": oesting, "nording": nording, "NEI": NEI} 
         
