@@ -211,7 +211,7 @@ with tab2:
     edited = st.data_editor(
         amrdataframe,
         key="editor_output_csv",
-        use_container_width=True,
+        width='stretch',
         column_config={
             'Inkluder': st.column_config.CheckboxColumn(
                 "Inkluder",
@@ -248,4 +248,5 @@ with tab2:
            on_click="ignore",
            mime='text/csv',
            icon=":material/download:",
+
            )
